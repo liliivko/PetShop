@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class UserController {
 
 
-    
+
     private JdbcTemplate jdbcTemplate;
 
     @PostMapping(value = "/users/add")
