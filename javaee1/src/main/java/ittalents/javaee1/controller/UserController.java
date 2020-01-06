@@ -1,7 +1,6 @@
 package ittalents.javaee1.controller;
 
-import model.User;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import ittalents.javaee1.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,7 @@ public class UserController {
     @PostMapping(value = "/users/add")
     public void addUser(@RequestBody User user) {
         // validation
-        //  dao.save(user);
+        //  ittalents.javaee1.dao.save(user);
 
     }
 

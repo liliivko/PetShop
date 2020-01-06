@@ -1,4 +1,4 @@
-package model;
+package ittalents.javaee1.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
