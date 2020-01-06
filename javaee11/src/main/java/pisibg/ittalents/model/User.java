@@ -2,43 +2,41 @@ package pisibg.ittalents.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-import java.beans.Transient;
+import javax.validation.constraints.NotBlank;
 
-@Getter
+@NoArgsConstructor
 @Setter
+@Getter
+@NotBlank
 public class User {
-   private long id;
+    
+    private long id;
     private String firstName;
     private String lastName;
-    private String gender;
+    private char gender;
     private String email;
-     //password validation - passay library!
-    @NotNull
     @JsonIgnore
     private String password;
     private boolean isAdmin;
+    private boolean isSubscribed;
 
-    public User() {
+
+    public User(long id, String firstName, String lastName, char gender, String email,
+                String password, boolean isSubscribed) {
+        this.id = id;
         this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.email = email;
+        this.password = password;
+        this.isAdmin = false;
+        this.isSubscribed= isSubscribed;
     }
 
-    public User(String firstName) {
-        this.firstName = firstName;
-    }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", isAdmin=" + isAdmin +
-                '}';
-    }
+
 
 }
