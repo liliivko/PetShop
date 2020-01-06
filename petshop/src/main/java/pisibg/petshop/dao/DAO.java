@@ -1,4 +1,0 @@
-package pisibg.petshop.dao;
-
-public class DAO {
-}
