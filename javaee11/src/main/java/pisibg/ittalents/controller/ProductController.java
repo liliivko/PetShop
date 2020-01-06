@@ -1,0 +1,60 @@
+package pisibg.ittalents.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import pisibg.ittalents.exception.ProductNotFoundException;
+import pisibg.ittalents.repository.ProductRepository;
+import pisibg.ittalents.model.Product;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+@RestController
+public class ProductController {
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @GetMapping(value = "/products/all")
+    public List<Product> getAll(){
+        return productRepository.findAll();
+    }
+
+    @GetMapping(value = "/products/{id}")
+    public Product getById(@PathVariable ("id") long id) throws ProductNotFoundException {
+        if(productRepository.findById(id).isPresent()){
+        return productRepository.findById(id).get();}
+        else{
+            throw new ProductNotFoundException("Product not found!");
+        }
+    }
+
+    @GetMapping(value = "/products/filter")
+    public List<Product> getAllByName(@RequestParam ("name")String name) throws ProductNotFoundException {
+        List<Product> products = productRepository.findAllByName(name);
+        if(!(products.isEmpty())){
+            return productRepository.findAllByName(name);}
+        else{
+            throw new ProductNotFoundException("Product not found!");
+        }
+    }
+
+    @PostMapping(value = "/products/add")
+    public Product save(@RequestBody Product product){
+        productRepository.save(product);
+        return product;
+    }
+
+    @DeleteMapping (value = "/products/delete/{id}")
+    public void removeProduct(@PathVariable ("id") long id, HttpServletResponse resp){
+        if(!productRepository.existsById(id)){
+            resp.setStatus(404);
+        }
+        else{
+            productRepository.deleteById(id);
+            resp.setStatus(200);
+        }
+    }
+
+
+}
