@@ -1,4 +1,4 @@
-package pisibg.ittalents.model;
+package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

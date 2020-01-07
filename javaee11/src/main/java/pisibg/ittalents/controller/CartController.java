@@ -3,8 +3,8 @@ package pisibg.ittalents.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.ProductNotFoundException;
-import pisibg.ittalents.repository.ProductRepository;
-import pisibg.ittalents.model.Product;
+import pisibg.ittalents.model.repository.ProductRepository;
+import pisibg.ittalents.model.pojo.Product;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;

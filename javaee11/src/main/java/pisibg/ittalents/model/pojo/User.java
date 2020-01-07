@@ -1,4 +1,4 @@
-package pisibg.ittalents.model;
+package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -11,8 +11,8 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @Getter
 @NotBlank
+
 public class User {
-    
     private long id;
     private String firstName;
     private String lastName;
@@ -24,9 +24,8 @@ public class User {
     private boolean isSubscribed;
 
 
-    public User(long id, String firstName, String lastName, char gender, String email,
+    public User(String firstName, String lastName, char gender, String email,
                 String password, boolean isSubscribed) {
-        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;

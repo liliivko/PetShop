@@ -1,7 +1,7 @@
-package pisibg.ittalents.repository;
+package pisibg.ittalents.model.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pisibg.ittalents.model.Product;
+import pisibg.ittalents.model.pojo.Product;
 
 import java.util.List;
 

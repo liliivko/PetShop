@@ -1,4 +1,4 @@
-package pisibg.ittalents.model;
+package pisibg.ittalents.model.pojo;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
