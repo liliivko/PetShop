@@ -1,44 +1,54 @@
 package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
+import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.pojo.User;
-import pisibg.ittalents.dao.UserDao;
 import org.springframework.web.bind.annotation.*;
+import pisibg.ittalents.model.repository.UserRepository;
 
+import java.sql.SQLException;
 import java.util.List;
+
 
 @RestController
 public class UserController {
 
+  //  @Autowired
+   // private JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private UserDao dao;
+    private UserRepository userRepository;
 
-    // if admin
-    @GetMapping(value ="/users/all")
-    public  List<User> getAll(){
-        return dao.getAllUsers();
+    @PostMapping(value = "/users/register")
+    public HiddenPasswordUserDTO register(@RequestBody RegisterUserDTO dto ) {
+        // validate if the user exists and password validation
+        // save to database
+        User user= new User(dto);
+        userRepository.save(user);
+        HiddenPasswordUserDTO hiddenPasswordUserDTO = new HiddenPasswordUserDTO(user);
+        return hiddenPasswordUserDTO;
     }
 
-    @PostMapping(value= "/users/register")
-    public User registerUser(@RequestBody User u){
-
-        return u;
+    @GetMapping(value = "/users")
+    //if admin
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 
-    @PostMapping("users/login")
-
-
-    @GetMapping (value = "users/{name}")
-    public User getByName(@PathVariable("name") String name){
-        for (User u : getAll()) {
-            if(u.getFirstName().equals(name)){
-                return u;
-            }
-        }
-        return null;
+    @ExceptionHandler(SQLException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public String handleSQLException() {
+        return "Sorry, something went wrong.Try again later";
     }
 
 
 
 }
+
+
+
+

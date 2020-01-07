@@ -1,41 +1,55 @@
 package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
+import pisibg.ittalents.model.dto.RegisterUserDTO;
 
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 
-@NoArgsConstructor
+
 @Setter
 @Getter
-@NotBlank
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+//TODO table - database
+@Table(name = "users")
 
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String firstName;
-    private String lastName;
+    @Column
+    private String first_name;
+    @Column
+    private String last_name;
+    @Column
     private char gender;
+    @Column
     private String email;
-    @JsonIgnore
+    @Column
     private String password;
-    private boolean isAdmin;
-    private boolean isSubscribed;
+    @Column
+    //TODO fix boolean
+    private boolean is_admin;
+    @Column
+    private boolean is_subscribed;
 
 
-    public User(String firstName, String lastName, char gender, String email,
-                String password, boolean isSubscribed) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.email = email;
-        this.password = password;
-        this.isAdmin = false;
-        this.isSubscribed= isSubscribed;
+    public User(RegisterUserDTO dto) {
+        setFirst_name(dto.getFirst_name());
+        setLast_name(dto.getLast_name());
+        setGender(dto.getGender());
+        setEmail(dto.getEmail());
+        setPassword(dto.getPassword());//TODO BCRYPT!
+        set_admin(dto.is_admin());
+        set_subscribed(dto.is_subscribed());
+
+
     }
-
-
-
 
 }
