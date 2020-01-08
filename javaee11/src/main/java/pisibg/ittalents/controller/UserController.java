@@ -79,7 +79,7 @@ public class UserController {
         return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
     }
 
-    @PutMapping("users/subscribe")
+   // TODO  @PutMapping("users/subscribe"), unsubscribe, get all orders
 
 
     @ExceptionHandler(SQLException.class)

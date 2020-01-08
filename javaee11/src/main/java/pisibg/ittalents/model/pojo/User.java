@@ -41,7 +41,7 @@ public class User {
     @Column
     private boolean is_subscribed;
 
-    //
+
     public User (RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());
         setLast_name(dto.getLast_name());
