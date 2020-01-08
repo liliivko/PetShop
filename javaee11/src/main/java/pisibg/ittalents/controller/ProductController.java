@@ -3,6 +3,7 @@ package pisibg.ittalents.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.ProductNotFoundException;
+import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
 
@@ -40,7 +41,9 @@ public class ProductController {
     }
 
     @PostMapping(value = "/products/add")
-    public Product save(@RequestBody Product product){
+    public Product save(@RequestBody RegularPriceProductDTO regularPriceProductDTO){
+        //TODO validate properties!
+        Product product = new Product(regularPriceProductDTO);
         productRepository.save(product);
         return product;
     }

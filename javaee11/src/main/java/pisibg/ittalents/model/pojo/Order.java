@@ -4,38 +4,42 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Getter
 @Setter
 @Entity
+@Component
 @Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
-    private long user_id;
-    private long address_id;
-    private String status;
-    private long payment_method_id;
+    private User user;
+//    private Address address; -> or just address id?
+    private OrderStatus status;
+    private PaymentMethod paymentMethod;
     @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
-    private LocalDateTime created_on;
+    private LocalDateTime createdOn;
     @Transient
     private double totalPrice;
-    @JsonManagedReference
-    @OneToMany(mappedBy = "pk.order")
+
     @Transient
-    private List<Product> orderedProducts = new ArrayList<>(); //for now?
+    private Map<Product, Integer> orderedProducts = new HashMap<>();
+
     @Transient
-    public double orderPrice(){
+    private double orderPrice(){
         double price = 0;
-        for (Product p:this.orderedProducts) {
-            price+= p.getPrice();
+        for (Map.Entry<Product, Integer> e : this.orderedProducts.entrySet()) {
+            price+= e.getKey().getPrice()*e.getValue();
         }
         return price;
     }
@@ -43,6 +47,15 @@ public class Order {
     @Transient
     public int getNumberOfProducts() {
         return this.orderedProducts.size();
+    }
+
+    public Order(Cart cart){
+        setUser(cart.getUser());
+        setStatus(new OrderStatus(1));
+        setPaymentMethod(new PaymentMethod()); //where from, like the addresses?
+        setCreatedOn(LocalDateTime.now());
+        setOrderedProducts(cart.getItems());
+        setTotalPrice(orderPrice());
     }
 
 }
