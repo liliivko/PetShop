@@ -8,7 +8,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LoginUserDTO {
 
-        private String username; //- email?
+        private String email;
         private String password;
 
     }
