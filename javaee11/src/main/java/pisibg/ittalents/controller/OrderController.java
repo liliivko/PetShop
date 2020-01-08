@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     //createOrder - PostMapping
-    //ViewOrder - GetMapping
-    //getOrderHistory - GetMapping
+    //ViewOrder - GetMapping - method exists in DAO
+    //getOrderHistory - GetMapping - method exists in DAO
 }

@@ -2,6 +2,7 @@ package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class Order {
     private double totalPrice;
 
     @Transient
-    private Map<Product, Integer> orderedProducts = new HashMap<>();
+    private HashMap<Product, Integer> orderedProducts = new HashMap<>();
 
     @Transient
     private double orderPrice(){
@@ -47,6 +48,11 @@ public class Order {
     @Transient
     public int getNumberOfProducts() {
         return this.orderedProducts.size();
+    }
+
+    public Order(User user, LocalDateTime createdOn) {
+        this.user = user;
+        this.createdOn = createdOn;
     }
 
     public Order(Cart cart){
