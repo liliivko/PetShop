@@ -21,8 +21,8 @@ import java.util.List;
 @RestController
 public class UserController {
 
-     @Autowired
-     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private UserRepository userRepository;
@@ -70,14 +70,17 @@ public class UserController {
     }
 
     @DeleteMapping("/users/delete")
+    // should i use user or hiddenpass user
     public ResponseEntity<String> deleteUser(@RequestBody User user, HttpSession session) {
         if (SessionManager.isLogged(session)) {
             userRepository.deleteById(user.getId());
             session.invalidate();
-            return ResponseEntity.noContent().build();
         }
         return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
     }
+
+    @PutMapping("users/subscribe")
+
 
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -94,7 +97,7 @@ public class UserController {
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public String handleUserNotFoundException() {
-        return "You need to register first";
+        return "You need to log in first";
     }
 
 }
