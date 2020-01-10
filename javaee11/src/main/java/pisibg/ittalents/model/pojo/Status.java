@@ -12,18 +12,16 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Entity(name = "OrderStatus")
+@Table(name ="order_statuses")
 @AllArgsConstructor
-@Entity(name = "PaymentMethod")
-@Table(name ="payment_methods")
-public class PaymentMethod {
+public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String type;
-
+    private String statusName;
     @OneToMany(
-            mappedBy = "paymentMethod",
+            mappedBy = "status",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
@@ -32,11 +30,14 @@ public class PaymentMethod {
 
     public void addOrder(Order order) {
         orders.add(order);
-        order.setPaymentMethod(this);
+        order.setStatus(this);
     }
 
     public void removeOrder(Order order) {
         orders.remove(order);
     }
 
+    public Status(long id){
+        this.id = id;
+    }
 }

@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class ErrorDTO {
 
     //TODO Exception handlng, Abstract Controller?

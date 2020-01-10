@@ -1,32 +1,34 @@
 package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
 @Getter
 @Setter
-@Entity
-@Component
+@Entity(name = "Order")
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-//    private Address address; -> or just address id?
-    private OrderStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_id")
+    private Status status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
     @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
     private LocalDateTime createdOn;
@@ -55,12 +57,12 @@ public class Order {
         this.createdOn = createdOn;
     }
 
-    public Order(Cart cart){
-        setUser(cart.getUser());
-        setStatus(new OrderStatus(1));
-        setPaymentMethod(new PaymentMethod()); //where from, like the addresses?
+    public Order(User user, HashMap<Product, Integer> cart){
+        setUser(user);
+        setStatus(new Status(1));
+        setPaymentMethod(new PaymentMethod());
         setCreatedOn(LocalDateTime.now());
-        setOrderedProducts(cart.getItems());
+        setOrderedProducts(cart);
         setTotalPrice(orderPrice());
     }
 

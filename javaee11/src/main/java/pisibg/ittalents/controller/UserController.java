@@ -94,7 +94,7 @@ public class UserController {
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        userDao.unsubscribe(user.getId());
+        userDao.unsubscribe(user);
         return new ResponseEntity<>("User unsubscribed successfully!", HttpStatus.OK);
     }
 
@@ -104,7 +104,7 @@ public class UserController {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        userDao.subscribe(user.getId());
+        userDao.subscribe(user);
         return new ResponseEntity<>("User subscribed successfully!", HttpStatus.OK);
     }
 

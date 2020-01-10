@@ -3,9 +3,11 @@ package pisibg.ittalents.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.ProductNotFoundException;
+import pisibg.ittalents.model.dto.ProductWithCategoryDTO;
 import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
+import pisibg.ittalents.model.repository.SubcategoryRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -15,6 +17,9 @@ public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private SubcategoryRepository subcategoryRepository;
 
     @GetMapping(value = "/products/all")
     public List<Product> getAll(){
@@ -41,11 +46,12 @@ public class ProductController {
     }
 
     @PostMapping(value = "/products/add")
-    public Product save(@RequestBody RegularPriceProductDTO regularPriceProductDTO){
+    public ProductWithCategoryDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO){
         //TODO validate properties!
+        regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
         Product product = new Product(regularPriceProductDTO);
         productRepository.save(product);
-        return product;
+        return new ProductWithCategoryDTO(product);
     }
 
     @DeleteMapping (value = "/products/delete/{id}")

@@ -1,21 +1,23 @@
 package pisibg.ittalents.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import pisibg.ittalents.model.pojo.Category;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.Subcategory;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Component
-@Entity
-@Table(name = "products")
 public class RegularPriceProductDTO {
 
     private long id;
@@ -24,6 +26,8 @@ public class RegularPriceProductDTO {
     private int quantity;
     private String description;
     private String image;
+    private long subcategoryId;
+    @JsonIgnore
     private Subcategory subcategory;
 
     public RegularPriceProductDTO(Product product){
@@ -33,7 +37,7 @@ public class RegularPriceProductDTO {
      setQuantity(product.getQuantity());
      setDescription(product.getDescription());
      setImage(product.getImage());
-     setSubcategory(product.getSubcategory());
+     setSubcategoryId(product.getSubcategory().getId());
     }
 
 }
