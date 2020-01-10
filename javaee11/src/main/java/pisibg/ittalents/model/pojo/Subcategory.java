@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="subcategories")
 public class Subcategory {
@@ -30,5 +31,6 @@ public class Subcategory {
         this.id = id;
         this.name = name;
     }
+
 
 }
