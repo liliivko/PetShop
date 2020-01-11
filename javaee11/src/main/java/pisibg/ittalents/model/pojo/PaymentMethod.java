@@ -12,8 +12,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "PaymentMethod")
 @Table(name ="payment_methods")
 public class PaymentMethod {
@@ -22,21 +22,8 @@ public class PaymentMethod {
     private long id;
     private String type;
 
-    @OneToMany(
-            mappedBy = "paymentMethod",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
 
-    private List<Order> orders = new ArrayList<>();
-
-    public void addOrder(Order order) {
-        orders.add(order);
-        order.setPaymentMethod(this);
+    public PaymentMethod(long id){
+        this.id = id;
     }
-
-    public void removeOrder(Order order) {
-        orders.remove(order);
-    }
-
 }

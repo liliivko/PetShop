@@ -33,9 +33,6 @@ public class Status {
         order.setStatus(this);
     }
 
-    public void removeOrder(Order order) {
-        orders.remove(order);
-    }
 
     public Status(long id){
         this.id = id;

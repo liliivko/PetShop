@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.RegularPriceProductDTO;
@@ -12,9 +15,10 @@ import pisibg.ittalents.model.pojo.Subcategory;
 import pisibg.ittalents.model.repository.SubcategoryRepository;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
 @Setter
@@ -22,11 +26,16 @@ import java.util.Objects;
 @Component
 @Entity
 @Table(name = "products")
-public class Product {
+@NaturalIdCache
+@org.hibernate.annotations.Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE
+)
+public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
+    @NaturalId
     private String name;
     private double price;
     private int quantity;
@@ -40,6 +49,16 @@ public class Product {
     @JoinColumn(name = "discount_id")
     private Discount discount;
     private double discountedPrice;
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<OrderProduct> orders = new ArrayList<>();
+
+//    @ManyToMany(mappedBy = "products")
+//    private Set<Order> orders = new HashSet<>();
 
     public Product(String name, double price, int quantity, String description, String image, Subcategory subcategory, LocalDate date) {
         this.name = name;
