@@ -10,7 +10,7 @@ import pisibg.ittalents.model.pojo.User;
 @Getter
 @NoArgsConstructor
 public class HiddenPasswordUserDTO {
-
+    private long id;
     private String first_name;
     private String last_name;
     private char gender;
@@ -18,6 +18,7 @@ public class HiddenPasswordUserDTO {
     private boolean is_subscribed;
 
     public HiddenPasswordUserDTO(User user) {
+        setId(user.getId());
         setFirst_name(user.getFirst_name());
         setLast_name(user.getLast_name());
         setGender(user.getGender());
