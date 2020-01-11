@@ -21,7 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//TODO table - database
 @Table(name = "users")
 public class User {
     @Id
@@ -35,10 +34,9 @@ public class User {
     private char gender;
     @Column
     private String email;
-    @Column()
+    @Column
     private String password;
     @Column
-    //TODO fix boolean
     private boolean is_admin;
     @Column
     private boolean is_subscribed;

@@ -13,18 +13,17 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "ratings")
-public class Ratings {
+public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
-    private long user_id;
-    @Column
-    private long product_id;
-    @Column
+    @ManyToOne
+    @JoinColumn(name = "users_id")
+    private User user;
+    @ManyToOne
+    @JoinColumn(name = "products_id")
+    private Product product;
     private String rating_text;
-    @Column
     private int rating_stars;
-
 
 }
