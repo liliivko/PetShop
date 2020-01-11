@@ -18,8 +18,6 @@ public class RegisterUserDTO {
     private String last_name;
     private char gender;
     private String email;
-    @NotNull
-    @Size(min = 2, max = 14)
     private String password;
     private String confirmationPassword;
     private boolean is_subscribed;

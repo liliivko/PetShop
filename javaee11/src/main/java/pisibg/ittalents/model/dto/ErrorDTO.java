@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 public class ErrorDTO {
-    //TODO Exception handlng, Abstract Controller?
     private String msg;
     private int status;
     private LocalDateTime time;
