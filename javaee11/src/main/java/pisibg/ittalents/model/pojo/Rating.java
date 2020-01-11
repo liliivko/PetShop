@@ -3,8 +3,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pisibg.ittalents.model.repository.RatingRepository;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Optional;
 
 
 @Setter
@@ -26,4 +29,7 @@ public class Rating {
     private String rating_text;
     private int rating_stars;
 
+
+
 }
+

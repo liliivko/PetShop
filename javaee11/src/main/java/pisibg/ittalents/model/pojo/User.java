@@ -43,7 +43,6 @@ public class User {
 
     @OneToMany(mappedBy="user")
     private List<Order> orders;
-
     public User (RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());
         setLast_name(dto.getLast_name());

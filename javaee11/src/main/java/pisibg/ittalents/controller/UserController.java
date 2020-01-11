@@ -33,7 +33,7 @@ public class UserController extends AbstractController {
     private AddressDao addressDao;
     @Autowired
     private UserRepository userRepository;
-    // TODO   get all orders, ratings
+    // TODO   get all orders
     @Autowired
     private RatingRepository ratingRepository;
 
