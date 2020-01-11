@@ -12,13 +12,14 @@ import pisibg.ittalents.model.dto.RegisterUserDTO;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "User")
 @Table(name = "users")
 public class User {
     @Id
@@ -38,23 +39,9 @@ public class User {
     private boolean is_admin;
     @Column
     private boolean is_subscribed;
-//    @OneToMany(
-//            mappedBy = "status",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
-//    )
-//
-//    private List<Order> orders = new ArrayList<>();
-//
-//    public void addOrder(Order order) {
-//        orders.add(order);
-//        order.setUser(this);
-//    }
-//
-//    public void removeOrder(Order order) {
-//        orders.remove(order);
-//    }
 
+    @OneToMany(mappedBy="user")
+    private List<Order> orders;
     public User (RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());
         setLast_name(dto.getLast_name());

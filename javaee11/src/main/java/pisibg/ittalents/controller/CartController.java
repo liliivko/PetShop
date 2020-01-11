@@ -109,17 +109,34 @@ public class CartController {
 
     //TODO - by session invalidation (logout, dies, restart) - DB should be updated with the quantities from all the carts!
 
-    //TODO send products from Cart to Order! and in DB
     @PostMapping(value = "checkout")
     public void checkOut(HttpSession session) {
-        //TODO logged user validation
+        if (!SessionManager.isLogged(session)) {
+            throw new AuthorizationException("You have to log in first");
+        }
+        User user = (User) session.getAttribute("user_logged");
         if (session.getAttribute("cart") == null) {
             throw new EmptyCartException("Cart is empty, nothing to order.");
         } else {
-            //is that supposed to be here??! or in OrderController - static method in controller?
-            Order order = new Order((User) session.getAttribute("user"), (HashMap<Product, Integer>) session.getAttribute("cart"));
+            HashMap<Long, Integer> cart = (HashMap<Long, Integer>) session.getAttribute("cart");
+            HashMap<Product, Integer> cartToOrder = new HashMap<>();
+            for (Map.Entry e: cart.entrySet()) {
+                cartToOrder.put(productRepository.getOne((Long)e.getKey()), (Integer)e.getValue());
+            }
+            Order order = new Order(user, cartToOrder);
+            for (Map.Entry e: cartToOrder.entrySet()) {
+                order.addProduct((Product)e.getKey());
+            }
+            System.out.println(order.getUser());
             orderRepository.save(order);
+
+            //TODO Cart - emptying
         }
+    }
+
+    //TODO
+    public void emptyingCart(){
+
     }
 
 }

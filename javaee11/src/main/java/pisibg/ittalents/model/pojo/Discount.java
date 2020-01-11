@@ -23,20 +23,4 @@ public class Discount {
     private double amount;
     private LocalDateTime expiryDate;
 
-//    @OneToMany(
-//            mappedBy = "discount",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
-//    )
-//
-//    private List<Product> products = new ArrayList<>();
-//
-//    public void addProduct(Product product) {
-//        products.add(product);
-//        product.setDiscount(this);
-//    }
-//
-//    public void removeProduct(Product product) {
-//        products.remove(product);
-//    }
 }
