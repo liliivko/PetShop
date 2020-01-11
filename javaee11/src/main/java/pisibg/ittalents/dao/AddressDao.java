@@ -1,6 +1,5 @@
 package pisibg.ittalents.dao;
 
-import com.sun.org.apache.xalan.internal.xsltc.dom.AdaptiveResultTreeImpl;
 import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.pojo.Address;
 import pisibg.ittalents.model.pojo.User;

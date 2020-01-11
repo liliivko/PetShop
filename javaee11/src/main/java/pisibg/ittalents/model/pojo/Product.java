@@ -14,6 +14,7 @@ import pisibg.ittalents.model.repository.SubcategoryRepository;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -62,5 +63,23 @@ public class Product {
         setDiscount(null);
         setDiscountedPrice(0);
         setDate(LocalDate.now());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id == product.id &&
+                Double.compare(product.price, price) == 0 &&
+                Objects.equals(name, product.name) &&
+                Objects.equals(description, product.description) &&
+                Objects.equals(image, product.image) &&
+                Objects.equals(subcategory, product.subcategory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, price, description, image, subcategory);
     }
 }

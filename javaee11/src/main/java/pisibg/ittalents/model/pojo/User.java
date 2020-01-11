@@ -40,22 +40,22 @@ public class User {
     private boolean is_admin;
     @Column
     private boolean is_subscribed;
-    @OneToMany(
-            mappedBy = "status",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+//    @OneToMany(
+//            mappedBy = "status",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
 
-    private List<Order> orders = new ArrayList<>();
-
-    public void addOrder(Order order) {
-        orders.add(order);
-        order.setUser(this);
-    }
-
-    public void removeOrder(Order order) {
-        orders.remove(order);
-    }
+//    private List<Order> orders = new ArrayList<>();
+//
+//    public void addOrder(Order order) {
+//        orders.add(order);
+//        order.setUser(this);
+//    }
+//
+//    public void removeOrder(Order order) {
+//        orders.remove(order);
+//    }
 
     public User (RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());
