@@ -25,7 +25,7 @@ import java.util.List;
 
 
 @RestController
-public class UserController {
+public class UserController extends AbstractController {
 
     @Autowired
     private UserDao userDao;
@@ -149,26 +149,6 @@ public class UserController {
     }
 
 
-
-
-
-    @ExceptionHandler(SQLException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleSQLException() {
-        return "Sorry, something went wrong.Try again later";
-    }
-
-    @ExceptionHandler(InvalidCredentialException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleInvalidException() {
-        return "Invalid credentials. Please, try again";
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String handleUserNotFoundException() {
-        return "You need to log in first";
-    }
 }
 
 

@@ -66,24 +66,4 @@ public class User {
     }
 
 
-// klasut promenlivata
-
-    //izbiram adres, v adres slagam @many to many
-   // cascade type.
-    // pod vsichko pisha
-   // join table po namer has adreses  ot adres i useri
-    //join column addresess_id
-    // inverse join v user_id
-    //private List<Tag> tags = new ArrayList<>(); na vseki vsichki useri
-    // dobavi addres
-    // equals i hascode
-
-    //address.addtouser;
-
-  //  pravq metod  add tag i remove
-
-    // i posle v address.add tozi user i dobavqm obekta user
-    // i mi ostava
-    // addressesrepository save
-
 }
