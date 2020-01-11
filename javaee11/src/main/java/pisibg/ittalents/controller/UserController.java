@@ -13,8 +13,10 @@ import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.pojo.Address;
+import pisibg.ittalents.model.pojo.Rating;
 import pisibg.ittalents.model.pojo.User;
 import org.springframework.web.bind.annotation.*;
+import pisibg.ittalents.model.repository.RatingRepository;
 import pisibg.ittalents.model.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
@@ -31,7 +33,9 @@ public class UserController {
     private AddressDao addressDao;
     @Autowired
     private UserRepository userRepository;
-// TODO   get all orders, ratings
+    // TODO   get all orders, ratings
+    @Autowired
+    private RatingRepository ratingRepository;
 
     @PostMapping(value = "/users/register")
     public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session) {
@@ -134,8 +138,8 @@ public class UserController {
         return new ResponseEntity<>("You have deleted an address", HttpStatus.OK);
     }
 
-    @PutMapping("/users/addresses" )
-    public ResponseEntity<String> editAddress(@ RequestBody Address address, HttpSession session) throws SQLException {
+    @PutMapping("/users/addresses")
+    public ResponseEntity<String> editAddress(@RequestBody Address address, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
@@ -144,21 +148,25 @@ public class UserController {
         return new ResponseEntity<>("You have edited your address", HttpStatus.OK);
     }
 
+
+
+
+
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleSQLException () {
+    public String handleSQLException() {
         return "Sorry, something went wrong.Try again later";
     }
 
     @ExceptionHandler(InvalidCredentialException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleInvalidException () {
+    public String handleInvalidException() {
         return "Invalid credentials. Please, try again";
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String handleUserNotFoundException () {
+    public String handleUserNotFoundException() {
         return "You need to log in first";
     }
 }

@@ -10,8 +10,7 @@ import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,5 +65,25 @@ public class User {
         set_subscribed(dto.is_subscribed());
     }
 
+
+// klasut promenlivata
+
+    //izbiram adres, v adres slagam @many to many
+   // cascade type.
+    // pod vsichko pisha
+   // join table po namer has adreses  ot adres i useri
+    //join column addresess_id
+    // inverse join v user_id
+    //private List<Tag> tags = new ArrayList<>(); na vseki vsichki useri
+    // dobavi addres
+    // equals i hascode
+
+    //address.addtouser;
+
+  //  pravq metod  add tag i remove
+
+    // i posle v address.add tozi user i dobavqm obekta user
+    // i mi ostava
+    // addressesrepository save
 
 }
