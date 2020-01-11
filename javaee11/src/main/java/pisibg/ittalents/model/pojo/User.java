@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
