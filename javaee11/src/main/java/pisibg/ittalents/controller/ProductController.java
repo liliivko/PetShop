@@ -17,7 +17,6 @@ public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private SubcategoryRepository subcategoryRepository;
 
@@ -62,6 +61,27 @@ public class ProductController {
         else{
             productRepository.deleteById(id);
             resp.setStatus(200);
+        }
+    }
+
+    @GetMapping(value = "/products/discounted")
+    public List<Product> getAllDiscounted() throws ProductNotFoundException {
+        List<Product> products = productRepository.findAllByDiscountNotNull();
+        if(!(products.isEmpty())){
+            return products;}
+        else{
+            throw new ProductNotFoundException("Product not found!");
+        }
+    }
+
+    //could put a validation if min price is higher than max price
+    @GetMapping(value = "/products/price")
+    public List<Product> getByMinAndMaxPRice(@RequestParam("minPrice") double minPrice, @RequestParam("maxPrice") double maxPrice) throws ProductNotFoundException {
+        List<Product> products = productRepository.findAllByPriceBetween(minPrice, maxPrice);
+        if(!(products.isEmpty())){
+            return products;}
+        else{
+            throw new ProductNotFoundException("Product not found!");
         }
     }
 
