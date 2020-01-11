@@ -37,15 +37,15 @@ public class ProductController {
 
     @GetMapping(value = "/products/filter")
     public List<Product> getAllByName(@RequestParam ("name")String name) throws ProductNotFoundException {
-        List<Product> products = productRepository.findAllByName(name);
+        List<Product> products = productRepository.findAllByNameLike("%"+name+"%");
         if(!(products.isEmpty())){
-            return productRepository.findAllByName(name);}
+            return productRepository.findAllByNameLike("%"+name+"%");}
         else{
             throw new ProductNotFoundException("Product not found!");
         }
     }
 
-    @PostMapping(value = "/products/add")
+    @PostMapping(value = "/products/")
     public ProductWithCategoryDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO){
         //TODO validate properties!
         regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
@@ -54,7 +54,7 @@ public class ProductController {
         return new ProductWithCategoryDTO(product);
     }
 
-    @DeleteMapping (value = "/products/delete/{id}")
+    @DeleteMapping (value = "/products/{id}")
     public void removeProduct(@PathVariable ("id") long id, HttpServletResponse resp){
         if(!productRepository.existsById(id)){
             resp.setStatus(404);
