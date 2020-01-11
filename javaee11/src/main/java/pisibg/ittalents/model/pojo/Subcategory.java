@@ -27,9 +27,10 @@ public class Subcategory {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public Subcategory(long id, String name) {
+    public Subcategory(long id, String name,Category category) {
         this.id = id;
         this.name = name;
+        this.category = category;
     }
 
 

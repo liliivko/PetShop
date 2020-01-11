@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>{
 
-    List<Product> findAllByName(String name);
+    List<Product> findAllByNameLike(String name);
 
     @Override
     void deleteById(Long aLong);
