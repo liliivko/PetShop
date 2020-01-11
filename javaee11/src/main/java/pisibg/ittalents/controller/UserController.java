@@ -44,13 +44,13 @@ public class UserController {
     }
 
     @GetMapping(value = "/users/all")
-    public List<User> getAllUsers(HttpSession session) {
+    public List<User> getAllUsers(HttpSession session) throws SQLException {
         List<User> users = null;
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You have to log in");
         }
-        if (user.is_admin()) {
+        if (userDao.is_admin(user)) {
             users = userRepository.findAll();
             return users;
         } else {
@@ -79,14 +79,17 @@ public class UserController {
     }
 
     @DeleteMapping("/users/delete")
-    public ResponseEntity<String> deleteUser(@RequestBody User user, HttpSession session) {
+    public ResponseEntity<String> deleteUser(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (user == null) {
+            throw new AuthorizationException("You need to log in first");
+        }
         if (SessionManager.isLogged(session)) {
-            userRepository.deleteById(user.getId());
+            userDao.deleteUser(user);
             session.invalidate();
         }
         return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
     }
-
 
     @PutMapping("/users/unsubscribe")
     public ResponseEntity<String> unsubscribe(HttpSession session) throws SQLException {
@@ -94,7 +97,7 @@ public class UserController {
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        userDao.unsubscribe(user);
+        userDao.unsubscribe(user.getId());
         return new ResponseEntity<>("User unsubscribed successfully!", HttpStatus.OK);
     }
 
@@ -104,43 +107,61 @@ public class UserController {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        userDao.subscribe(user);
+        userDao.subscribe(user.getId());
         return new ResponseEntity<>("User subscribed successfully!", HttpStatus.OK);
     }
 
     @PostMapping("/users/addresses")
     public ResponseEntity<String> addAddress(@RequestBody Address address, HttpSession session) throws SQLException {
-        // add address, connect it to user
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
         addressDao.saveAddress(address);
-        addressDao.addAddress(user,address);
+        // TODO addressDao.addAddressToBridgeTable(user, saveAddress);
         return new ResponseEntity<>("You have added an address", HttpStatus.OK);
     }
 
+    @DeleteMapping("/users/addresses")
+    public ResponseEntity<String> deleteAddress(Address address, HttpSession session)
+            throws SQLException {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (!SessionManager.isLogged(session)) {
+            throw new AuthorizationException("You have to log in first");
+        }
+        addressDao.deleteAddress(address);
+        addressDao.deleteUserAddress(user);
+        return new ResponseEntity<>("You have deleted an address", HttpStatus.OK);
+    }
+
+    @PutMapping("/users/addresses" )
+    public ResponseEntity<String> editAddress(@ RequestBody Address address, HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (!SessionManager.isLogged(session)) {
+            throw new AuthorizationException("You have to log in first");
+        }
+        addressDao.updateAddress(address);
+        return new ResponseEntity<>("You have edited your address", HttpStatus.OK);
+    }
 
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleSQLException() {
+    public String handleSQLException () {
         return "Sorry, something went wrong.Try again later";
     }
 
     @ExceptionHandler(InvalidCredentialException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleInvalidException() {
+    public String handleInvalidException () {
         return "Invalid credentials. Please, try again";
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String handleUserNotFoundException() {
+    public String handleUserNotFoundException () {
         return "You need to log in first";
     }
-
 }
-
 
 
 

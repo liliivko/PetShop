@@ -1,6 +1,7 @@
 package pisibg.ittalents.controller;
 
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.pojo.User;
@@ -13,17 +14,17 @@ public class Authenticator {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
-     public static boolean isEmailValid(String email) {
+    public static boolean isEmailValid(String email) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
         return matcher.find();
     }
 
 
     public static boolean passwordIsAuthenticated(LoginUserDTO loginUser, User user) {
-        return user.getPassword().equals(loginUser.getPassword());
+        return BCrypt.checkpw(loginUser.getPassword(), user.getPassword());
     }
 
-   public static boolean validateConfirmPassword(String password, String confirmPassword) {
+    public static boolean validateConfirmPassword(String password, String confirmPassword) {
         return (password.equals(confirmPassword));
     }
 
