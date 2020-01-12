@@ -21,10 +21,8 @@ public class Address {
     private String address_text;
     private String postal_code;
 
-    @ManyToMany(cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
+    @ManyToMany(cascade = CascadeType.MERGE,
+            fetch = FetchType.EAGER)
 
     @JoinTable(name = "user_has_address",
             joinColumns = @JoinColumn(name = "address_id"),
