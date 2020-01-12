@@ -3,10 +3,7 @@ package pisibg.ittalents.model.pojo;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Setter
 @Getter
@@ -33,7 +30,7 @@ public class Address {
             joinColumns = @JoinColumn(name = "address_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private ArrayList<User> usersAddresses = new ArrayList<>();
+    private Set<User> usersAddresses = new HashSet<>();
 
     public void addAddressToUser(User user) {
         usersAddresses.add(user);

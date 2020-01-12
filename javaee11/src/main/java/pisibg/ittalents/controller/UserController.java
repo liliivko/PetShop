@@ -15,11 +15,13 @@ import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.pojo.Address;
 import pisibg.ittalents.model.pojo.User;
 import org.springframework.web.bind.annotation.*;
+import pisibg.ittalents.model.repository.AddressRepository;
 import pisibg.ittalents.model.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -32,6 +34,8 @@ public class UserController extends AbstractController {
     @Autowired
     private UserRepository userRepository;
     // TODO   get all orders
+    @Autowired
+    AddressRepository addressRepository;
 
     @PostMapping(value = "/users/register")
     public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session) {
@@ -123,16 +127,31 @@ public class UserController extends AbstractController {
         return new ResponseEntity<>("User subscribed successfully!", HttpStatus.OK);
     }
 
-    @PostMapping("/users/addresses")
-    public ResponseEntity<String> addAddress(@RequestBody Address address, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+    @PostMapping("/users/{id}")
+    public ResponseEntity<String> addAddress(@RequestBody Address address,
+                                             @PathVariable("id") Long id, HttpSession session) throws SQLException {
+        User loggedUser = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        addressDao.saveAddress(address);
+        User user = findUserById(id);
+        address.addAddressToUser(user);
+         addressRepository.save(address);
+        //addressDao.saveAddress(address);
         // TODO addressDao.addAddressToBridgeTable(user, saveAddress);
         return new ResponseEntity<>("You have added an address", HttpStatus.OK);
     }
+
+
+    public User findUserById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
 
     @DeleteMapping("/users/addresses")
     public ResponseEntity<String> deleteAddress(Address address, HttpSession session)

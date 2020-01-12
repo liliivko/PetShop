@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
-
 import javax.persistence.*;
 import java.util.*;
 
@@ -39,7 +38,7 @@ public class User {
     private List<Order> orders;
 
     @ManyToMany(mappedBy = "usersAddresses")
-    private List<Address> addresses;
+    private Set<Address> addresses= new HashSet<>();
 
     public User(RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());
