@@ -5,9 +5,4 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ProductDAO extends DAO {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-
-
 }

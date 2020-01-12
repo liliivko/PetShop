@@ -19,7 +19,6 @@ public class Authenticator {
         return matcher.find();
     }
 
-
     public static boolean passwordIsAuthenticated(LoginUserDTO loginUser, User user) {
         return BCrypt.checkpw(loginUser.getPassword(), user.getPassword());
     }

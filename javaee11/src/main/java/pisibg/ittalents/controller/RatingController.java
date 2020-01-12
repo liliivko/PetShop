@@ -99,7 +99,5 @@ public class RatingController extends AbstractController {
             throw new AuthorizationException("You are not authorized to delete this rating");
         }
         ratingRepository.deleteById(id);
-
-
     }
 }

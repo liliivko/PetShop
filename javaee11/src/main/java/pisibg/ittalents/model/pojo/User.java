@@ -34,7 +34,6 @@ public class User {
     @Column
     private boolean is_subscribed;
 
-
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Order> orders;
 

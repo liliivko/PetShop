@@ -25,5 +25,4 @@ public class HiddenPasswordUserDTO {
         setEmail(user.getEmail());
         set_subscribed(user.is_subscribed());
     }
-
 }

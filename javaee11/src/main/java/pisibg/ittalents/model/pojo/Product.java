@@ -57,9 +57,6 @@ public class Product implements Serializable {
     )
     private List<OrderProduct> orders = new ArrayList<>();
 
-//    @ManyToMany(mappedBy = "products")
-//    private Set<Order> orders = new HashSet<>();
-
     public Product(String name, double price, int quantity, String description, String image, Subcategory subcategory, LocalDate date) {
         this.name = name;
         this.price = price;
@@ -69,7 +66,6 @@ public class Product implements Serializable {
         this.subcategory = subcategory;
         this.date = date;
     }
-
 
     public Product (RegularPriceProductDTO regularPriceProductDTO){
         setId(regularPriceProductDTO.getId());

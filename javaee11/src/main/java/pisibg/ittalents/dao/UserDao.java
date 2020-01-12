@@ -14,7 +14,6 @@ import java.sql.SQLException;
 @Component
 public class UserDao extends DAO {
 
-
     public void subscribe(long id) throws SQLException {
         String sql = "UPDATE users SET is_subscribed = 1 WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -52,5 +51,4 @@ public class UserDao extends DAO {
             return result.getBoolean("is_admin");
         }
     }
-
 }

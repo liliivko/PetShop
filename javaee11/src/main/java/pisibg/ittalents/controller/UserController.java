@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-
 @RestController
 public class UserController extends AbstractController {
 
@@ -33,7 +32,6 @@ public class UserController extends AbstractController {
     private AddressDao addressDao;
     @Autowired
     private UserRepository userRepository;
-    // TODO   get all orders
     @Autowired
     AddressRepository addressRepository;
 
@@ -142,7 +140,6 @@ public class UserController extends AbstractController {
         return new ResponseEntity<>("You have added an address", HttpStatus.OK);
     }
 
-
     public User findUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
@@ -151,7 +148,6 @@ public class UserController extends AbstractController {
             throw new UserNotFoundException("User not found");
         }
     }
-
 
     @DeleteMapping("/users/addresses")
     public ResponseEntity<String> deleteAddress(Address address, HttpSession session)
@@ -174,8 +170,6 @@ public class UserController extends AbstractController {
         addressDao.updateAddress(address);
         return new ResponseEntity<>("You have edited your address", HttpStatus.OK);
     }
-
-
 }
 
 

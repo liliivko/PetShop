@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 
 public abstract class AbstractController {
 
-
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDTO handleSQLException(Exception e) {
@@ -36,7 +35,6 @@ public abstract class AbstractController {
                 e.getClass().getName());
         return errorDTO;
     }
-
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

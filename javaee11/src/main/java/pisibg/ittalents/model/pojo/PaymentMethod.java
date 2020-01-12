@@ -21,11 +21,9 @@ public class PaymentMethod {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String type;
-
     public PaymentMethod(String type) {
         this.type = type;
     }
-
     public PaymentMethod(long id){
         this.id = id;
     }

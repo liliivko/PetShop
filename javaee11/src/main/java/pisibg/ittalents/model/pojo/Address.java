@@ -23,13 +23,11 @@ public class Address {
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
+            CascadeType.MERGE})
 
     @JoinTable(name = "user_has_address",
             joinColumns = @JoinColumn(name = "address_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> usersAddresses = new HashSet<>();
 
     public void addAddressToUser(User user) {

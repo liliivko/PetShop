@@ -21,18 +21,6 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String statusName;
-//    @OneToMany(
-//            mappedBy = "status",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
-//    )
-//
-//    private List<Order> orders = new ArrayList<>();
-
-//    public void addOrder(Order order) {
-//        orders.add(order);
-//        order.setStatus(this);
-//    }
 
     public Status(String statusName) {
         this.statusName = statusName;
