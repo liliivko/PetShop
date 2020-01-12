@@ -48,8 +48,7 @@ public class Product implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "discount_id")
     private Discount discount;
-    private double discountedPrice;
-
+    @JsonIgnore
     @OneToMany(
             mappedBy = "product",
             cascade = CascadeType.ALL,

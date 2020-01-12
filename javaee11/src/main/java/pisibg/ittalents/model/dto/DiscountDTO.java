@@ -5,14 +5,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @NoArgsConstructor
 public class DiscountDTO {
+    private long id;
     private String name;
     private double amount;
-    private LocalDate date_from;
-    private LocalDate date_to;
+    private LocalDateTime date_from;
+    private LocalDateTime date_to;
 }
 

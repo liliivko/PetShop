@@ -9,8 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Getter
 @Setter
@@ -24,6 +23,6 @@ public class Discount {
     private long id;
     private String name;
     private double amount;
-    private LocalDate date_from;
-    private LocalDate date_to;
+    private LocalDateTime date_from;
+    private LocalDateTime date_to;
 }

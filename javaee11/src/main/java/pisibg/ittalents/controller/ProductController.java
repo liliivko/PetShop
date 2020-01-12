@@ -65,7 +65,7 @@ public class ProductController extends AbstractController {
 
     @GetMapping(value = "/products/discounted")
     public List<Product> getAllDiscounted() throws ProductNotFoundException {
-        List<Product> products = productRepository.findAllByDiscountNotNull();
+        List<Product> products = productRepository.findAllByDiscountIdNot(1);
         if (!(products.isEmpty())) {
             return products;
         } else {
