@@ -37,7 +37,7 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Order> orders;
 
-    @ManyToMany(mappedBy = "usersAddresses")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usersAddresses",cascade = CascadeType.MERGE )
     private Set<Address> addresses= new HashSet<>();
 
     public User(RegisterUserDTO dto) {

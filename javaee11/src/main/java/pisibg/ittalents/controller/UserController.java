@@ -9,6 +9,7 @@ import pisibg.ittalents.dao.UserDao;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.InvalidCredentialException;
 import pisibg.ittalents.exception.UserNotFoundException;
+import pisibg.ittalents.model.dto.AddressDTO;
 import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
@@ -20,7 +21,6 @@ import pisibg.ittalents.model.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -57,21 +57,6 @@ public class UserController extends AbstractController {
         return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/users/all")
-    public List<User> getAllUsers(HttpSession session) throws SQLException {
-        List<User> users = null;
-        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
-        if (user == null) {
-            throw new AuthorizationException("You have to log in");
-        }
-        if (userDao.is_admin(user)) {
-            users = userRepository.findAll();
-            return users;
-        } else {
-            throw new AuthorizationException("You are not authorized");
-        }
-    }
-
     @PostMapping("/users/login")
     public HiddenPasswordUserDTO login(@RequestBody LoginUserDTO loginUser, HttpSession session) {
         User user = userRepository.findByEmail(loginUser.getEmail());
@@ -90,19 +75,6 @@ public class UserController extends AbstractController {
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         return new ResponseEntity<>("You have logged out", HttpStatus.OK);
-    }
-
-    @DeleteMapping("/users/delete")
-    public ResponseEntity<String> deleteUser(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
-        if (user == null) {
-            throw new AuthorizationException("You need to log in first");
-        }
-        if (SessionManager.isLogged(session)) {
-            userDao.deleteUser(user);
-            session.invalidate();
-        }
-        return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
     }
 
     @PutMapping("/users/unsubscribe")
@@ -126,17 +98,18 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/users/{id}")
-    public ResponseEntity<String> addAddress(@RequestBody Address address,
-                                             @PathVariable("id") Long id, HttpSession session) throws SQLException {
-        User loggedUser = (User) session.getAttribute(SessionManager.USER__LOGGED);
+    public ResponseEntity<String> addAddress(@RequestBody AddressDTO addressDTO,
+                                             @PathVariable("id") HttpSession session) {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        User user = findUserById(id);
+        Address address = new Address();
+        address.setCity(addressDTO.getCity());
+        address.setAddress_text(addressDTO.getAddress_text());
+        address.setPostal_code(addressDTO.getPostal_code());
         address.addAddressToUser(user);
-         addressRepository.save(address);
-        //addressDao.saveAddress(address);
-        // TODO addressDao.addAddressToBridgeTable(user, saveAddress);
+        addressRepository.save(address);
         return new ResponseEntity<>("You have added an address", HttpStatus.OK);
     }
 
@@ -149,25 +122,42 @@ public class UserController extends AbstractController {
         }
     }
 
-    @DeleteMapping("/users/addresses")
-    public ResponseEntity<String> deleteAddress(Address address, HttpSession session)
-            throws SQLException {
+    public Address findAddressById(Long id) {
+        Optional<Address> address = addressRepository.findById(id);
+        if (address.isPresent()) {
+            return address.get();
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
+    // TODO is this the correct way to delete?
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteAddress(@PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        addressDao.deleteAddress(address);
-        addressDao.deleteUserAddress(user);
+        Address address = findAddressById(id);
+        address.removeAddressToUser(user);
+        addressRepository.delete(address);
         return new ResponseEntity<>("You have deleted an address", HttpStatus.OK);
     }
 
-    @PutMapping("/users/addresses")
-    public ResponseEntity<String> editAddress(@RequestBody Address address, HttpSession session) throws SQLException {
+    //TODO should I validate that the user owns the address or the url is enough
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> editAddress(@RequestBody AddressDTO addressDTO,
+                                              @PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        addressDao.updateAddress(address);
+        Address address = findAddressById(id);
+        address.setCity(addressDTO.getCity());
+        address.setAddress_text(addressDTO.getAddress_text());
+        address.setPostal_code(addressDTO.getPostal_code());
+        address.addAddressToUser(user);
+        addressRepository.save(address);
         return new ResponseEntity<>("You have edited your address", HttpStatus.OK);
     }
 }
