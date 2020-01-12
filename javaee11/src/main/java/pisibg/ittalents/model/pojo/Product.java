@@ -76,7 +76,6 @@ public class Product implements Serializable {
         setImage(regularPriceProductDTO.getImage());
         setSubcategory(regularPriceProductDTO.getSubcategory());
         setDiscount(null);
-        setDiscountedPrice(0);
         setDate(LocalDate.now());
     }
 
