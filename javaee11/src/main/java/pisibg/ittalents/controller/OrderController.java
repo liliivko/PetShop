@@ -11,12 +11,10 @@ import pisibg.ittalents.exception.OrderNotFoundException;
 import pisibg.ittalents.model.dto.OrdersByUserDTO;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.pojo.Order;
-import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.OrderRepository;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController

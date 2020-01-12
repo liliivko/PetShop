@@ -26,8 +26,7 @@ public class Address {
 
     @JoinTable(name = "user_has_address",
             joinColumns = @JoinColumn(name = "address_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> usersAddresses = new HashSet<>();
 
     public void addAddressToUser(User user) {

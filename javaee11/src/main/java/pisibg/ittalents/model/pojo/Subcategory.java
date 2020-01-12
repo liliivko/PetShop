@@ -1,5 +1,6 @@
 package pisibg.ittalents.model.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,11 +10,11 @@ import java.io.Serializable;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name="subcategories")
 public class Subcategory  implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -21,11 +22,5 @@ public class Subcategory  implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    public Subcategory(long id, String name, Category category) {
-        this.id = id;
-        this.name = name;
-        this.category = category;
-    }
 
 }

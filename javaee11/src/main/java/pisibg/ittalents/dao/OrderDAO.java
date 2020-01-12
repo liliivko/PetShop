@@ -30,7 +30,6 @@ public class OrderDAO extends DAO {
             "            WHERE o.user_id = ?\n" +
             "            group by o.id";
 
-
     private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, p.price, op.quantity, p.description, p.image, s.name as subcategory, c.name, s.id, c.id\n" +
             "            FROM orders AS o\n" +
             "            JOIN order_has_product AS op \n" +
@@ -46,13 +45,6 @@ public class OrderDAO extends DAO {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-
-
-//    private String image;
-//    private String subcategoryName;
-//
-
 
     public List<ProductFromCartDTO> getProductsFromOrder (Order order) throws SQLException{
         Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -94,6 +86,4 @@ public class OrderDAO extends DAO {
         }
         return orders;
     }
-
-
 }

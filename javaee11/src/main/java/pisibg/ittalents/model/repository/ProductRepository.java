@@ -12,10 +12,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
     List<Product> findAllByNameLike(String name);
     List<Product> findAllByDiscountNotNull();
     List<Product> findAllByPriceBetween(double minPrice, double maxPrice);
-
-    @Override
-    void deleteById(Long aLong);
-
+//    @Override
+//    void deleteById(Long aLong);
 
 }
 

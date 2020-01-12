@@ -84,6 +84,4 @@ public class ProductController  extends AbstractController {
             throw new ProductNotFoundException("Product not found!");
         }
     }
-
-
 }

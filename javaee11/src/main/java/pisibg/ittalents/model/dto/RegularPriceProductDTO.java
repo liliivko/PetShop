@@ -39,5 +39,4 @@ public class RegularPriceProductDTO {
      setImage(product.getImage());
      setSubcategoryId(product.getSubcategory().getId());
     }
-
 }

@@ -36,5 +36,4 @@ public class OrdersByUserDTO {
         setCreatedOn(order.getCreatedOn());
         setTotalPrice(order.getTotalPrice());
     }
-
 }

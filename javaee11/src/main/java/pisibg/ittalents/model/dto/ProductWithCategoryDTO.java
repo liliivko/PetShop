@@ -42,6 +42,4 @@ public class ProductWithCategoryDTO {
         setSubcategoryName(product.getSubcategory().getName());
         setCategoryName(product.getSubcategory().getCategory().getName());
     }
-
-
 }

@@ -41,6 +41,4 @@ public class ProductFromCartDTO {
         setSubcategoryName(product.getSubcategory().getName());
         setCategoryName(product.getSubcategory().getCategory().getName());
     }
-
-
 }

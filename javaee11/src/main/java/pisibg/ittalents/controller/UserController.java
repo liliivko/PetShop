@@ -23,7 +23,6 @@ import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.Optional;
 
-
 @RestController
 public class UserController extends AbstractController {
 
@@ -33,7 +32,6 @@ public class UserController extends AbstractController {
     private AddressDao addressDao;
     @Autowired
     private UserRepository userRepository;
-    // TODO   get all orders
     @Autowired
     AddressRepository addressRepository;
 
@@ -162,8 +160,6 @@ public class UserController extends AbstractController {
         addressRepository.save(address);
         return new ResponseEntity<>("You have edited your address", HttpStatus.OK);
     }
-
-
 }
 
 
