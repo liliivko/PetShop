@@ -60,16 +60,6 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ErrorDTO handleProductNotFoundException(Exception e) {
-        ErrorDTO errorDTO = new ErrorDTO(
-                e.getMessage(),
-                HttpStatus.NOT_FOUND.value(),
-                LocalDateTime.now(),
-                e.getClass().getName());
-        return errorDTO;
-    }
 
 
 
