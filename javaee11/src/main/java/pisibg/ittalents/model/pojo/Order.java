@@ -30,6 +30,7 @@ public class Order {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
+    //TODO Address implementation in the order - JSON?
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "address_id")
 //    private Address address;
@@ -38,23 +39,15 @@ public class Order {
     @Transient
     private double totalPrice;
 
-//    @ManyToMany(cascade = { CascadeType.ALL })
-//    @JoinTable(
-//            name = "order_has_product",
-//            joinColumns = { @JoinColumn(name = "order_id") },
-//            inverseJoinColumns = { @JoinColumn(name = "product_id") }
-//    )
-//    Set<Product> products = new HashSet<>();
-
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<OrderProduct> products = new ArrayList<>();
+
     @Transient
     private HashMap<Product, Integer> orderedProducts = new HashMap<>();
-
 
     @Transient
     private double orderPrice(){
@@ -65,25 +58,19 @@ public class Order {
         return price;
     }
 
-    @Transient
-    public int getNumberOfProducts() {
-        return this.orderedProducts.size();
-    }
-
     public Order(User user, LocalDateTime createdOn) {
         this.user = user;
         this.createdOn = createdOn;
     }
 
-    public Order(User user, HashMap<Product, Integer> cart){
+    public Order(User user, HashMap<Product, Integer> cart, long paymentmethodId){
         this.user = user;
         setStatus(new Status(1));
-        setPaymentMethod(new PaymentMethod(1));
+        setPaymentMethod(new PaymentMethod(paymentmethodId));
         setCreatedOn(LocalDateTime.now());
         setOrderedProducts(cart);
         setTotalPrice(orderPrice());
     }
-
 
     public void addProduct(Product product) {
         OrderProduct orderProduct = new OrderProduct(this, product);
@@ -91,7 +78,7 @@ public class Order {
         product.getOrders().add(orderProduct);
     }
 
-    public void removeTag(Product product) {
+    public void removeProduct(Product product) {
         for (Iterator<OrderProduct> iterator = products.iterator();
              iterator.hasNext(); ) {
             OrderProduct orderProduct = iterator.next();

@@ -20,7 +20,7 @@ public abstract class AbstractController {
     public ErrorDTO handleSQLException(Exception e) {
         ErrorDTO errorDTO = new ErrorDTO(
                 e.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
         return errorDTO;
@@ -37,16 +37,6 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ErrorDTO handleUserNotFoundException(Exception e) {
-        ErrorDTO errorDTO = new ErrorDTO(
-                e.getMessage(),
-                HttpStatus.NOT_FOUND.value(),
-                LocalDateTime.now(),
-                e.getClass().getName());
-        return errorDTO;
-    }
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
