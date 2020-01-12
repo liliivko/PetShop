@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
-public class ProductController  extends AbstractController {
+public class ProductController extends AbstractController {
 
     @Autowired
     private ProductRepository productRepository;
@@ -21,31 +21,31 @@ public class ProductController  extends AbstractController {
     private SubcategoryRepository subcategoryRepository;
 
     @GetMapping(value = "/products/all")
-    public List<Product> getAll(){
+    public List<Product> getAll() {
         return productRepository.findAll();
     }
 
     @GetMapping(value = "/products/{id}")
-    public Product getById(@PathVariable ("id") long id) throws ProductNotFoundException {
-        if(productRepository.findById(id).isPresent()){
-        return productRepository.findById(id).get();}
-        else{
+    public Product getById(@PathVariable("id") long id) throws ProductNotFoundException {
+        if (productRepository.findById(id).isPresent()) {
+            return productRepository.findById(id).get();
+        } else {
             throw new ProductNotFoundException("Product not found!");
         }
     }
 
     @GetMapping(value = "/products/filter")
-    public List<Product> getAllByName(@RequestParam ("name")String name) throws ProductNotFoundException {
-        List<Product> products = productRepository.findAllByNameLike("%"+name+"%");
-        if(!(products.isEmpty())){
-            return productRepository.findAllByNameLike("%"+name+"%");}
-        else{
+    public List<Product> getAllByName(@RequestParam("name") String name) throws ProductNotFoundException {
+        List<Product> products = productRepository.findAllByNameLike("%" + name + "%");
+        if (!(products.isEmpty())) {
+            return productRepository.findAllByNameLike("%" + name + "%");
+        } else {
             throw new ProductNotFoundException("Product not found!");
         }
     }
 
     @PostMapping(value = "/products/")
-    public ProductWithCategoryDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO){
+    public ProductWithCategoryDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO) {
         //TODO validate properties!
         regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
         Product product = new Product(regularPriceProductDTO);
@@ -53,12 +53,11 @@ public class ProductController  extends AbstractController {
         return new ProductWithCategoryDTO(product);
     }
 
-    @DeleteMapping (value = "/products/{id}")
-    public void removeProduct(@PathVariable ("id") long id, HttpServletResponse resp){
-        if(!productRepository.existsById(id)){
+    @DeleteMapping(value = "/products/{id}")
+    public void removeProduct(@PathVariable("id") long id, HttpServletResponse resp) {
+        if (!productRepository.existsById(id)) {
             resp.setStatus(404);
-        }
-        else{
+        } else {
             productRepository.deleteById(id);
             resp.setStatus(200);
         }
@@ -67,9 +66,9 @@ public class ProductController  extends AbstractController {
     @GetMapping(value = "/products/discounted")
     public List<Product> getAllDiscounted() throws ProductNotFoundException {
         List<Product> products = productRepository.findAllByDiscountNotNull();
-        if(!(products.isEmpty())){
-            return products;}
-        else{
+        if (!(products.isEmpty())) {
+            return products;
+        } else {
             throw new ProductNotFoundException("Product not found!");
         }
     }
@@ -78,10 +77,13 @@ public class ProductController  extends AbstractController {
     @GetMapping(value = "/products/price")
     public List<Product> getByMinAndMaxPRice(@RequestParam("minPrice") double minPrice, @RequestParam("maxPrice") double maxPrice) throws ProductNotFoundException {
         List<Product> products = productRepository.findAllByPriceBetween(minPrice, maxPrice);
-        if(!(products.isEmpty())){
-            return products;}
-        else{
+        if (!(products.isEmpty())) {
+            return products;
+        } else {
             throw new ProductNotFoundException("Product not found!");
         }
     }
+
+
 }
+

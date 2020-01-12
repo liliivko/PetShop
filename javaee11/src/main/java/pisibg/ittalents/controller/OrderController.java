@@ -30,7 +30,7 @@ public class OrderController extends AbstractController{
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        User user = (User) session.getAttribute("user_logged");
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!(orderRepository.existsById(orderId))){
             throw new OrderNotFoundException("Order not found!");
         }
@@ -48,7 +48,7 @@ public class OrderController extends AbstractController{
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        User user = (User) session.getAttribute("user_logged");
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
 
         List <OrdersByUserDTO> orders = orderDao.getAllOrdersByUser(user);
         return orders;

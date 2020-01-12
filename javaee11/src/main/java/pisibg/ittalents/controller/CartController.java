@@ -111,7 +111,7 @@ public class CartController extends AbstractController {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        User user = (User) session.getAttribute("user_logged");
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (session.getAttribute("cart") == null) {
             throw new EmptyCartException("Cart is empty, nothing to order.");}
         if(!(paymentMethodRepository.existsById(paymentMethod))){

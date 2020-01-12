@@ -113,14 +113,6 @@ public class UserController extends AbstractController {
         return new ResponseEntity<>("You have added an address", HttpStatus.OK);
     }
 
-    public User findUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new UserNotFoundException("User not found");
-        }
-    }
 
     public Address findAddressById(Long id) {
         Optional<Address> address = addressRepository.findById(id);
@@ -131,7 +123,6 @@ public class UserController extends AbstractController {
         }
     }
 
-    // TODO is this the correct way to delete?
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteAddress(@PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
@@ -139,12 +130,14 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         Address address = findAddressById(id);
+        if (!user.getAddresses().contains(address)){
+            throw new AuthorizationException("Yoy are not authorized delete this address");
+        }
         address.removeAddressToUser(user);
         addressRepository.delete(address);
         return new ResponseEntity<>("You have deleted an address", HttpStatus.OK);
     }
 
-    //TODO should I validate that the user owns the address or the url is enough
     @PutMapping("/users/{id}")
     public ResponseEntity<String> editAddress(@RequestBody AddressDTO addressDTO,
                                               @PathVariable("id") Long id, HttpSession session) {
@@ -153,6 +146,9 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         Address address = findAddressById(id);
+        if(!user.getAddresses().contains(address)){
+            throw new AuthorizationException("Yoy are not authorized delete this address");
+        }
         address.setCity(addressDTO.getCity());
         address.setAddress_text(addressDTO.getAddress_text());
         address.setPostal_code(addressDTO.getPostal_code());

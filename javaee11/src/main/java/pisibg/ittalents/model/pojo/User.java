@@ -41,7 +41,7 @@ public class User {
         setGender(dto.getGender());
         setEmail(dto.getEmail());
         setPassword(dto.getPassword());
-        set_subscribed(dto.is_subscribed());
+        set_subscribed(true);
     }
 
     @Override
