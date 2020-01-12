@@ -1,34 +1,31 @@
 package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
-import pisibg.ittalents.exception.AuthorizationException;
-import pisibg.ittalents.exception.EmptyCartException;
-import pisibg.ittalents.exception.OutOfStockException;
-import pisibg.ittalents.exception.ProductNotFoundException;
+import pisibg.ittalents.exception.*;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.pojo.Order;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.OrderRepository;
+import pisibg.ittalents.model.repository.PaymentMethodRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class CartController {
+public class CartController extends AbstractController {
     @Autowired
     ProductRepository productRepository;
     @Autowired
     OrderRepository orderRepository;
+    @Autowired
+    PaymentMethodRepository paymentMethodRepository;
 
     @PostMapping(value = "buy/{id}/quantity/{pieces}") // + quantity also from the url? 1 by default?
     public void addToCart(@PathVariable("id") long productId, @PathVariable("pieces") int pieces, HttpSession session) {
@@ -109,34 +106,30 @@ public class CartController {
 
     //TODO - by session invalidation (logout, dies, restart) - DB should be updated with the quantities from all the carts!
 
-    @PostMapping(value = "checkout")
-    public void checkOut(HttpSession session) {
+    @PostMapping(value = "checkout/paymentmethod/{paymentmethod}")
+    public void checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod) {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
         User user = (User) session.getAttribute("user_logged");
         if (session.getAttribute("cart") == null) {
-            throw new EmptyCartException("Cart is empty, nothing to order.");
+            throw new EmptyCartException("Cart is empty, nothing to order.");}
+        if(!(paymentMethodRepository.existsById(paymentMethod))){
+            throw new InvalidPaymentMethodException("The payment method is invalid.");
         } else {
             HashMap<Long, Integer> cart = (HashMap<Long, Integer>) session.getAttribute("cart");
             HashMap<Product, Integer> cartToOrder = new HashMap<>();
             for (Map.Entry e: cart.entrySet()) {
                 cartToOrder.put(productRepository.getOne((Long)e.getKey()), (Integer)e.getValue());
             }
-            Order order = new Order(user, cartToOrder);
+            Order order = new Order(user, cartToOrder, paymentMethod);
             for (Map.Entry e: cartToOrder.entrySet()) {
                 order.addProduct((Product)e.getKey());
             }
             System.out.println(order.getUser());
             orderRepository.save(order);
-
-            //TODO Cart - emptying
+            cart.clear();
         }
-    }
-
-    //TODO
-    public void emptyingCart(){
-
     }
 
 }

@@ -34,6 +34,7 @@ public class User {
     @Column
     private boolean is_subscribed;
 
+
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 

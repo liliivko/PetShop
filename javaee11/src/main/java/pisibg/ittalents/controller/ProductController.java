@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
-public class ProductController {
+public class ProductController  extends AbstractController {
 
     @Autowired
     private ProductRepository productRepository;
