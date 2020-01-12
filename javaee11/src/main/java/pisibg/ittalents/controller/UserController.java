@@ -13,10 +13,8 @@ import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.pojo.Address;
-import pisibg.ittalents.model.pojo.Rating;
 import pisibg.ittalents.model.pojo.User;
 import org.springframework.web.bind.annotation.*;
-import pisibg.ittalents.model.repository.RatingRepository;
 import pisibg.ittalents.model.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
@@ -34,16 +32,26 @@ public class UserController extends AbstractController {
     @Autowired
     private UserRepository userRepository;
     // TODO   get all orders
-    @Autowired
-    private RatingRepository ratingRepository;
 
     @PostMapping(value = "/users/register")
     public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session) {
         User user = new User(dto);
+        if (!Authenticator.isEmailValid(user.getEmail())) {
+            throw new InvalidCredentialException("Email should be valid");
+        }
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new InvalidCredentialException("An account with this email exists.Please, log in");
+        }
         String pass = user.getPassword();
-        user.setPassword(Authenticator.encodePassword(pass));
-        SessionManager.logInUser(session, user);
-        userRepository.save(user);
+        String confirmPass = dto.getConfirmationPassword();
+        if (Authenticator.validateConfirmPassword(pass, confirmPass)) {
+            user.setPassword(Authenticator.encodePassword(pass));
+            SessionManager.logInUser(session, user);
+            user.set_subscribed(true);
+            userRepository.save(user);
+        } else {
+            throw new InvalidCredentialException("Password should be the same as confirm password ");
+        }
         return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
 

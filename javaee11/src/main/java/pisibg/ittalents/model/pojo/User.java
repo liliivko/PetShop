@@ -2,17 +2,12 @@ package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Setter
@@ -40,9 +35,13 @@ public class User {
     @Column
     private boolean is_subscribed;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(mappedBy = "user")
     private List<Order> orders;
-    public User (RegisterUserDTO dto) {
+
+    @ManyToMany(mappedBy = "usersAddresses")
+    private List<Address> addresses;
+
+    public User(RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());
         setLast_name(dto.getLast_name());
         setGender(dto.getGender());
@@ -51,4 +50,16 @@ public class User {
         set_subscribed(dto.is_subscribed());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return getId() == user.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }
