@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.OrdersByUserDTO;
+import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.pojo.*;
 
 import java.sql.*;
@@ -30,7 +31,7 @@ public class OrderDAO extends DAO {
             "            group by o.id";
 
 
-    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.id as order_id, p.id as product_id, p.name, p.price, op.quantity, p.description, p.image, s.name as subcategory, c.name, s.id, c.id\n" +
+    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, p.price, op.quantity, p.description, p.image, s.name as subcategory, c.name, s.id, c.id\n" +
             "            FROM orders AS o\n" +
             "            JOIN order_has_product AS op \n" +
             "            ON order_id = o.id \n" +
@@ -46,30 +47,33 @@ public class OrderDAO extends DAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public HashMap<Product, Integer> getProductsFromOrder (Order order) throws SQLException{
+
+
+//    private String image;
+//    private String subcategoryName;
+//
+
+
+    public List<ProductFromCartDTO> getProductsFromOrder (Order order) throws SQLException{
         Connection connection = jdbcTemplate.getDataSource().getConnection();
+        ArrayList<ProductFromCartDTO> products = new ArrayList<>();
         try(PreparedStatement ps = connection.prepareStatement(PRODUCTS_FROM_ORDER_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, order.getId());
             ResultSet rows = ps.executeQuery();
-            if(rows.next()) {
-                Product product = new Product(rows.getString("p.name"),
-                        rows.getDouble("p.price"),
-                        rows.getInt("op.quantity"),
-                        rows.getString("p.description"),
-                        rows.getString("p.image"),
-                        new Subcategory(rows.getLong ("p.subcategory_id"),
-                                rows.getString("s.name"),
-                                new Category(rows.getLong("c.id"),
-                                            rows.getString("c.name"))),
-                        rows.getDate("date").toLocalDate()
-                        );
-                order.getOrderedProducts().put(product, product.getQuantity());
-            }
-            else{
-                return null;
+            while (rows.next()) {
+                ProductFromCartDTO product = new ProductFromCartDTO();
+                product.setId(rows.getLong("product_id"));
+               product.setQuantity(rows.getInt("quantity"));
+                product.setName(rows.getString("p.name"));
+                product.setPrice(rows.getDouble("price"));
+                product.setDescription(rows.getString("description"));
+                product.setCategoryName(rows.getString("c.name"));
+                product.setSubcategoryName(rows.getString("subcategory"));
+                product.setImage(rows.getString("image"));
+                products.add(product);
             }
         }
-        return order.getOrderedProducts();
+        return products;
     }
 
     public List<OrdersByUserDTO> getAllOrdersByUser(User user) throws SQLException {

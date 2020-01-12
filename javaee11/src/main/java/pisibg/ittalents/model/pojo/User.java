@@ -35,7 +35,7 @@ public class User {
     private boolean is_subscribed;
 
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Order> orders;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usersAddresses",cascade = CascadeType.MERGE )

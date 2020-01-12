@@ -9,6 +9,7 @@ import pisibg.ittalents.dao.OrderDAO;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.OrderNotFoundException;
 import pisibg.ittalents.model.dto.OrdersByUserDTO;
+import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.pojo.Order;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
@@ -27,7 +28,7 @@ public class OrderController extends AbstractController{
     OrderRepository orderRepository;
 
     @GetMapping(value = "viewOrder/{id}")
-    public HashMap<Product, Integer> view(@PathVariable("id") long orderId, HttpSession session) throws SQLException {
+    public List<ProductFromCartDTO> view(@PathVariable("id") long orderId, HttpSession session) throws SQLException {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
@@ -39,9 +40,9 @@ public class OrderController extends AbstractController{
         if (!(user.getOrders().contains(order))){
             throw new AuthorizationException("You are not authorized to view this order.");
         }
-        else{
-        return orderDao.getProductsFromOrder(order);}
-
+        else {
+            return orderDao.getProductsFromOrder(order);
+        }
     }
 
     @GetMapping(value = "myorders")
