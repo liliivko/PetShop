@@ -5,8 +5,10 @@ import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.exception.*;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
+import pisibg.ittalents.model.pojo.Address;
 import pisibg.ittalents.model.pojo.Order;
 import pisibg.ittalents.model.pojo.User;
+import pisibg.ittalents.model.repository.AddressRepository;
 import pisibg.ittalents.model.repository.OrderRepository;
 import pisibg.ittalents.model.repository.PaymentMethodRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
@@ -26,6 +28,8 @@ public class CartController extends AbstractController {
     OrderRepository orderRepository;
     @Autowired
     PaymentMethodRepository paymentMethodRepository;
+    @Autowired
+    AddressRepository addressRepository;
 
     @PostMapping(value = "buy/{id}/quantity/{pieces}") // + quantity also from the url? 1 by default?
     public void addToCart(@PathVariable("id") long productId, @PathVariable("pieces") int pieces, HttpSession session) {
@@ -106,8 +110,9 @@ public class CartController extends AbstractController {
 
     //TODO - by session invalidation (logout, dies, restart) - DB should be updated with the quantities from all the carts!
 
-    @PostMapping(value = "checkout/paymentmethod/{paymentmethod}")
-    public void checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod) {
+    @PostMapping(value = "checkout/paymentmethod/{paymentmethod}/address/{address}")
+    public void checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod,
+                         @PathVariable("address") long address) {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
@@ -115,19 +120,24 @@ public class CartController extends AbstractController {
         if (session.getAttribute("cart") == null) {
             throw new EmptyCartException("Cart is empty, nothing to order.");}
         if(!(paymentMethodRepository.existsById(paymentMethod))){
-            throw new InvalidPaymentMethodException("The payment method is invalid.");
+            throw new InvalidPaymentMethodException("The payment method is invalid.");}
+        if(!(addressRepository.existsById(address))){
+            throw new AddressNotFoundException("Address not found. Please add address to your profile.");}
+        Address ordersAddress = addressRepository.getOne(address);
+        if (!(user.getAddresses().contains(ordersAddress))){
+            throw new AuthorizationException("You are not authorized to view this order.");
         } else {
             HashMap<Long, Integer> cart = (HashMap<Long, Integer>) session.getAttribute("cart");
             HashMap<Product, Integer> cartToOrder = new HashMap<>();
             for (Map.Entry e: cart.entrySet()) {
                 cartToOrder.put(productRepository.getOne((Long)e.getKey()), (Integer)e.getValue());
             }
-            Order order = new Order(user, cartToOrder, paymentMethod);
+            Order order = new Order(user, cartToOrder, paymentMethod, ordersAddress);
             for (Map.Entry e: cartToOrder.entrySet()) {
                 order.addProduct((Product)e.getKey());
             }
-            System.out.println(order.getUser());
             orderRepository.save(order);
+            user.getOrders().add(order);
             cart.clear();
         }
     }

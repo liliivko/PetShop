@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import pisibg.ittalents.model.repository.AddressRepository;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,9 +33,9 @@ public class Order {
     @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
     //TODO Address implementation in the order - JSON?
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "address_id")
-//    private Address address;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id")
+    private Address address;
     @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
     private LocalDateTime createdOn;
     @Transient
@@ -45,6 +47,9 @@ public class Order {
             orphanRemoval = true
     )
     private List<OrderProduct> products = new ArrayList<>();
+    @Transient
+    @Autowired
+    AddressRepository addressRepository;
 
     @Transient
     private HashMap<Product, Integer> orderedProducts = new HashMap<>();
@@ -63,10 +68,11 @@ public class Order {
         this.createdOn = createdOn;
     }
 
-    public Order(User user, HashMap<Product, Integer> cart, long paymentmethodId){
+    public Order(User user, HashMap<Product, Integer> cart, long paymentmethodId, Address address){
         this.user = user;
         setStatus(new Status(1));
         setPaymentMethod(new PaymentMethod(paymentmethodId));
+        setAddress(address);
         setCreatedOn(LocalDateTime.now());
         setOrderedProducts(cart);
         setTotalPrice(orderPrice());
