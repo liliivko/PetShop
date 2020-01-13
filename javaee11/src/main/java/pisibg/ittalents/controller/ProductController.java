@@ -2,15 +2,19 @@ package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.exception.ProductNotFoundException;
 import pisibg.ittalents.model.dto.ProductWithCategoryDTO;
 import pisibg.ittalents.model.dto.RegularPriceProductDTO;
+import pisibg.ittalents.model.pojo.Discount;
+import pisibg.ittalents.model.repository.DiscountRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.repository.SubcategoryRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ProductController extends AbstractController {
@@ -19,6 +23,8 @@ public class ProductController extends AbstractController {
     private ProductRepository productRepository;
     @Autowired
     private SubcategoryRepository subcategoryRepository;
+    @Autowired
+    private DiscountRepository discountRepository;
 
     @GetMapping(value = "/products/all")
     public List<Product> getAll() {
@@ -38,7 +44,10 @@ public class ProductController extends AbstractController {
     public List<Product> getAllByName(@RequestParam("name") String name) throws ProductNotFoundException {
         List<Product> products = productRepository.findAllByNameLike("%" + name + "%");
         if (!(products.isEmpty())) {
-            return productRepository.findAllByNameLike("%" + name + "%");
+            for (Product p: products) {
+                setCurrentPrice(p);
+            }
+            return products;
         } else {
             throw new ProductNotFoundException("Product not found!");
         }
@@ -65,7 +74,7 @@ public class ProductController extends AbstractController {
 
     @GetMapping(value = "/products/discounted")
     public List<Product> getAllDiscounted() throws ProductNotFoundException {
-        List<Product> products = productRepository.findAllByDiscountIdNot(1);
+        List<Product> products = productRepository.findAllByDiscountNotNull();
         if (!(products.isEmpty())) {
             return products;
         } else {
@@ -73,7 +82,6 @@ public class ProductController extends AbstractController {
         }
     }
 
-    //could put a validation if min price is higher than max price
     @GetMapping(value = "/products/price")
     public List<Product> getByMinAndMaxPRice(@RequestParam("minPrice") double minPrice, @RequestParam("maxPrice") double maxPrice) throws ProductNotFoundException {
         List<Product> products = productRepository.findAllByPriceBetween(minPrice, maxPrice);
@@ -84,6 +92,17 @@ public class ProductController extends AbstractController {
         }
     }
 
+    public void setCurrentPrice(Product product){
+        if(product.getDiscount() != null){
+            Optional<Discount> optionalDiscount = discountRepository.findById(product.getDiscount().getId());
+            if(optionalDiscount.isPresent()){
+                Discount discount = optionalDiscount.get();
+                product.setPrice(product.getPrice() - discount.getAmount()/100*product.getPrice());
+            } else{
+                throw new NotFoundException("No discount found");
+            }
+        }
+    }
 
 }
 

@@ -34,17 +34,6 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
-    @ExceptionHandler(AuthorizationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorDTO handleUnauthorized(Exception e){
-        ErrorDTO errorDTO = new ErrorDTO(
-                e.getMessage(),
-                HttpStatus.UNAUTHORIZED.value(),
-                LocalDateTime.now(),
-                e.getClass().getName());
-        return errorDTO;
-    }
-
     @ExceptionHandler(EmptyCartException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDTO handleEmptycart(Exception e){

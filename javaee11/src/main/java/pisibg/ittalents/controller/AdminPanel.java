@@ -24,10 +24,6 @@ import java.util.Optional;
 public class AdminPanel extends AbstractController {
     @Autowired
     private UserDAO userDao;
-<<<<<<< HEAD
-
-=======
->>>>>>> d2768250bbca8bd85c05b81cf04c929b9ffc7e02
     @Autowired
     private UserRepository userRepository;
     @Autowired
