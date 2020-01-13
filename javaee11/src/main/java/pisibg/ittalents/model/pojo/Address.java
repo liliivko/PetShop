@@ -1,5 +1,6 @@
 package pisibg.ittalents.model.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,7 +24,7 @@ public class Address {
 
     @ManyToMany(cascade = CascadeType.MERGE,
             fetch = FetchType.EAGER)
-
+    @JsonIgnore
     @JoinTable(name = "user_has_address",
             joinColumns = @JoinColumn(name = "address_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))

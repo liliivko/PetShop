@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
+import pisibg.ittalents.dao.DiscountDAO;
 import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.NotFoundException;
@@ -23,11 +24,7 @@ import java.util.Optional;
 @RestController
 public class AdminPanel extends AbstractController {
     @Autowired
-    private UserDAO userDao;
-<<<<<<< HEAD
-
-=======
->>>>>>> d2768250bbca8bd85c05b81cf04c929b9ffc7e02
+    private DiscountDAO discountDAO;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -41,7 +38,7 @@ public class AdminPanel extends AbstractController {
         if (user == null) {
             throw new AuthorizationException("You have to log in");
         }
-        if (userDao.is_admin(user)) {
+        if (user.is_admin()) {
             return userRepository.findAll();
         } else {
             throw new AuthorizationException("You are not authorized");
@@ -88,6 +85,7 @@ public class AdminPanel extends AbstractController {
             if (!findUserById(user.getId()).is_admin()) { //TODO check
                 throw new AuthorizationException("You are not authorized");
             }
+
             Discount discount = new Discount();
             discount.setName(discountDTO.getName());
             discount.setAmount(discountDTO.getAmount());
@@ -95,7 +93,27 @@ public class AdminPanel extends AbstractController {
             discount.setDate_to(discountDTO.getDate_to());
             discountRepository.save(discount);
         }
-        return new ResponseEntity<>( "Discount added", HttpStatus.CREATED);
+        return new ResponseEntity<>("Discount added", HttpStatus.CREATED);
     }
+
     //TODO delete discount
+    //todo CHECK LONG, return DTO
+    @PostMapping("applydiscount")
+    public ResponseEntity<String> applytoSubcategory(@RequestParam("discount_id") long discountId,
+                                                     @RequestParam("sucategory_id") long subcategoryId,
+                                                     HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (user == null) {
+            throw new AuthorizationException("You need to log in first");
+        }
+
+        if (SessionManager.isLogged(session)) {
+            if (!findUserById(user.getId()).is_admin()) { //TODO check
+                throw new AuthorizationException("You are not authorized");
+            }
+            // get discount id and add it to products which are from certain category
+            discountDAO.applyDiscount(discountId,subcategoryId);
+        }
+        return new ResponseEntity<>("Discount added", HttpStatus.CREATED);
+    }
 }

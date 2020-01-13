@@ -1,6 +1,9 @@
 package pisibg.ittalents.model.pojo;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -28,12 +31,12 @@ public class User {
     private boolean is_admin;
     @Column
     private boolean is_subscribed;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Order> orders;
-
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usersAddresses",cascade = CascadeType.MERGE )
-    private Set<Address> addresses= new HashSet<>();
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usersAddresses", cascade = CascadeType.MERGE)
+    private Set<Address> addresses = new HashSet<>();
 
     public User(RegisterUserDTO dto) {
         setFirst_name(dto.getFirst_name());

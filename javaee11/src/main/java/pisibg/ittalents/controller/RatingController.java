@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.BadRequestException;
+import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.exception.ProductNotFoundException;
 import pisibg.ittalents.model.dto.RatingDTO;
 import pisibg.ittalents.model.pojo.Product;
@@ -63,7 +64,7 @@ public class RatingController extends AbstractController {
         if (product.isPresent()) {
             return product.get();
         } else {
-            throw new ProductNotFoundException("Product not found");
+            throw new NotFoundException("Product not found");
         }
     }
 

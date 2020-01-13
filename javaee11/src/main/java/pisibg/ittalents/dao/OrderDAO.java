@@ -43,9 +43,7 @@ public class OrderDAO extends DAO {
             "            WHERE order_id = ? \n" +
             "            GROUP BY product_id";
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
+// TODO remove generated keys
     public List<ProductFromCartDTO> getProductsFromOrder (Order order) throws SQLException{
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         ArrayList<ProductFromCartDTO> products = new ArrayList<>();
