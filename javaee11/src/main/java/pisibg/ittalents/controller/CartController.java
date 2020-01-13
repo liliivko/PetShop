@@ -122,7 +122,7 @@ public class CartController extends AbstractController {
         if(!(paymentMethodRepository.existsById(paymentMethod))){
             throw new InvalidPaymentMethodException("The payment method is invalid.");}
         if(!(addressRepository.existsById(address))){
-            throw new AddressNotFoundException("Address not found. Please add address to your profile.");}
+            throw new NotFoundException("Address not found. Please add address to your profile.");}
         Address ordersAddress = addressRepository.getOne(address);
         if (!(user.getAddresses().contains(ordersAddress))){
             throw new AuthorizationException("You are not authorized to view this order.");

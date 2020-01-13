@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
+import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.model.dto.DiscountDTO;
 import pisibg.ittalents.model.pojo.Discount;
 import pisibg.ittalents.model.pojo.User;
@@ -23,8 +24,6 @@ import java.util.Optional;
 public class AdminPanel extends AbstractController {
     @Autowired
     private UserDAO userDao;
-    @Autowired
-    private AddressDAO addressDao;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -50,7 +49,7 @@ public class AdminPanel extends AbstractController {
         if (user.isPresent()) {
             return user.get();
         } else {
-            throw new UserNotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
     }
 
