@@ -23,7 +23,7 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
-    @ExceptionHandler(InvalidCredentialException.class)
+    @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public ErrorDTO handleInvalidException(Exception e) {
         ErrorDTO errorDTO = new ErrorDTO(
