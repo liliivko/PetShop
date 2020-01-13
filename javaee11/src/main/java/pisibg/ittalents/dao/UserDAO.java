@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class UserDao extends DAO {
+public class UserDAO extends DAO {
 
     public void subscribe(long id) throws SQLException {
         String sql = "UPDATE users SET is_subscribed = 1 WHERE id = ?;";

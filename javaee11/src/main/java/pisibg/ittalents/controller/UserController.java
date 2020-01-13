@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pisibg.ittalents.SessionManager;
-import pisibg.ittalents.dao.AddressDao;
-import pisibg.ittalents.dao.UserDao;
+import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
-import pisibg.ittalents.exception.InvalidCredentialException;
-import pisibg.ittalents.exception.UserNotFoundException;
+import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.model.dto.AddressDTO;
 import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.LoginUserDTO;
@@ -27,22 +25,21 @@ import java.util.Optional;
 public class UserController extends AbstractController {
 
     @Autowired
-    private UserDao userDao;
-    @Autowired
-    private AddressDao addressDao;
+    private UserDAO userDao;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     AddressRepository addressRepository;
 
     @PostMapping(value = "/users/register")
+    //TODO trim
     public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session) {
         User user = new User(dto);
         if (!Authenticator.isEmailValid(user.getEmail())) {
-            throw new InvalidCredentialException("Email should be valid");
+            throw new AuthorizationException("Email should be valid");
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            throw new InvalidCredentialException("An account with this email exists.Please, log in");
+            throw new AuthorizationException("An account with this email exists.Please, log in");
         }
         String pass = user.getPassword();
         String confirmPass = dto.getConfirmationPassword();
@@ -52,7 +49,7 @@ public class UserController extends AbstractController {
             user.set_subscribed(true);
             userRepository.save(user);
         } else {
-            throw new InvalidCredentialException("Password should be the same as confirm password ");
+            throw new AuthorizationException("Password should be the same as confirm password ");
         }
         return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
@@ -61,13 +58,13 @@ public class UserController extends AbstractController {
     public HiddenPasswordUserDTO login(@RequestBody LoginUserDTO loginUser, HttpSession session) {
         User user = userRepository.findByEmail(loginUser.getEmail());
         if (user == null) {
-            throw new UserNotFoundException("Invalid user name or password. Please, try again!");
+            throw new NotFoundException("Invalid user name or password. Please, try again!");
         }
         if (Authenticator.passwordIsAuthenticated(loginUser, user)) {
             SessionManager.logInUser(session, user);
             return new HiddenPasswordUserDTO(user);
         } else {
-            throw new InvalidCredentialException("Invalid credentials");
+            throw new AuthorizationException("Invalid credentials");
         }
     }
 
@@ -83,7 +80,9 @@ public class UserController extends AbstractController {
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        userDao.unsubscribe(user.getId());
+        if (user.is_subscribed()) {
+            userDao.unsubscribe(user.getId());
+        }
         return new ResponseEntity<>("User unsubscribed successfully!", HttpStatus.OK);
     }
 
@@ -93,13 +92,16 @@ public class UserController extends AbstractController {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
+        if (user.is_subscribed()) {
+            throw new AuthorizationException("You are already subscribed");
+        }
         userDao.subscribe(user.getId());
         return new ResponseEntity<>("User subscribed successfully!", HttpStatus.OK);
     }
 
-    @PostMapping("/users/{id}")
+    @PostMapping("/users/{id}")//TODO
     public ResponseEntity<String> addAddress(@RequestBody AddressDTO addressDTO,
-                                             @PathVariable("id") HttpSession session) {
+                                             @PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
@@ -119,7 +121,7 @@ public class UserController extends AbstractController {
         if (address.isPresent()) {
             return address.get();
         } else {
-            throw new UserNotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
     }
 
@@ -130,7 +132,7 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         Address address = findAddressById(id);
-        if (!user.getAddresses().contains(address)){
+        if (!user.getAddresses().contains(address)) {
             throw new AuthorizationException("Yoy are not authorized delete this address");
         }
         address.removeAddressToUser(user);
@@ -146,7 +148,7 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         Address address = findAddressById(id);
-        if(!user.getAddresses().contains(address)){
+        if (!user.getAddresses().contains(address)) {
             throw new AuthorizationException("Yoy are not authorized delete this address");
         }
         address.setCity(addressDTO.getCity());

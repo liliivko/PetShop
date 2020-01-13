@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.EmptyCartException;
-import pisibg.ittalents.exception.InvalidCredentialException;
-import pisibg.ittalents.exception.UserNotFoundException;
 import pisibg.ittalents.model.dto.ErrorDTO;
 
 import java.sql.SQLException;

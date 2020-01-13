@@ -8,7 +8,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 
-public class RatingDto {
+public class RatingDTO {
     private String rating_text;
     private int rating_stars;
+
 }

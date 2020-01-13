@@ -5,10 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
-import pisibg.ittalents.dao.AddressDao;
-import pisibg.ittalents.dao.UserDao;
+import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
-import pisibg.ittalents.exception.UserNotFoundException;
 import pisibg.ittalents.model.dto.DiscountDTO;
 import pisibg.ittalents.model.pojo.Discount;
 import pisibg.ittalents.model.pojo.User;
@@ -24,9 +22,9 @@ import java.util.Optional;
 @RestController
 public class AdminPanel extends AbstractController {
     @Autowired
-    private UserDao userDao;
+    private UserDAO userDao;
     @Autowired
-    private AddressDao addressDao;
+    private AddressDAO addressDao;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -56,6 +54,7 @@ public class AdminPanel extends AbstractController {
         }
     }
 
+    //TODO fix
     @DeleteMapping("/users/delete")
     public ResponseEntity<String> deleteUser(HttpSession session, Long id) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);

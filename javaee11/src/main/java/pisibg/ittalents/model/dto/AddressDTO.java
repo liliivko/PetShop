@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class AddressDTO {
-
+    long id;
     private String city;
     private String address_text;
     private String postal_code;

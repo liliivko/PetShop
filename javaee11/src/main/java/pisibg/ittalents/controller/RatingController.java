@@ -1,16 +1,14 @@
 package pisibg.ittalents.controller;
 
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
-import pisibg.ittalents.dao.RatingDao;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.BadRequestException;
 import pisibg.ittalents.exception.ProductNotFoundException;
-import pisibg.ittalents.model.dto.RatingDto;
+import pisibg.ittalents.model.dto.RatingDTO;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.Rating;
 import pisibg.ittalents.model.pojo.User;
@@ -24,8 +22,6 @@ import java.util.Optional;
 @RestController
 public class RatingController extends AbstractController {
 
-    @Autowired
-    RatingDao ratingDao;
     @Autowired
     RatingRepository ratingRepository;
     @Autowired
@@ -46,8 +42,8 @@ public class RatingController extends AbstractController {
         return ratingRepository.findAllByUser_Id(user.getId());
     }
 
-    @PostMapping("ratings/{id}")
-    public ResponseEntity<Rating> rateProduct(@RequestBody RatingDto ratingDto,
+    @PostMapping("ratings/{id}")//TODO if there isn't a product
+    public ResponseEntity<Rating> rateProduct(@RequestBody RatingDTO ratingDto,
                                               @PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
@@ -80,7 +76,7 @@ public class RatingController extends AbstractController {
         }
     }
 
-    @GetMapping("/product/ratings/{id}")
+    @GetMapping("/products/{id}/ratings/")
     public List<Rating> getRatingsForProduct(@PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
@@ -89,13 +85,13 @@ public class RatingController extends AbstractController {
         return ratingRepository.findAllByProduct_Id(id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/ratings/{id}")
     public void deleteById(@PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        if (user.getId() != getRatingById(id).getId()) {
+        if (user.getId() != getRatingById(id).getUser().getId()) {
             throw new AuthorizationException("You are not authorized to delete this rating");
         }
         ratingRepository.deleteById(id);

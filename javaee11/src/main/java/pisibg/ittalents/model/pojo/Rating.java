@@ -3,6 +3,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.repository.RatingRepository;
 
 import javax.persistence.*;
@@ -30,6 +31,9 @@ public class Rating {
     private int rating_stars;
 
 
-
+    public Rating(Rating dto) {
+        setRating_text(dto.rating_text);
+        setRating_stars(dto.rating_stars);
+    }
 }
 
