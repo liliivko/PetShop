@@ -34,7 +34,10 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> a41b030e388aae522c572629a01d373aa8f62172
     @ExceptionHandler(EmptyCartException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDTO handleEmptycart(Exception e){

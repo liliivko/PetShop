@@ -26,6 +26,8 @@ public class AdminPanel extends AbstractController {
     @Autowired
     private DiscountDAO discountDAO;
     @Autowired
+    private UserDAO userDao;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     AddressRepository addressRepository;

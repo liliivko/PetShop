@@ -79,10 +79,17 @@ public class CartController extends AbstractController {
             if (!(cart.containsKey(product.getId()))) {
                 throw new ProductNotFoundException("Product not found");
             } else {
-                cart.put(product.getId(), cart.get(product.getId()) - pieces);
-                if (cart.get(product.getId()) <= 0 ) {
+                int quantity = cart.get(product.getId());
+                if(quantity>pieces){
+                    cart.put(product.getId(), cart.get(product.getId()) - pieces);
+                    product.setQuantity(product.getQuantity() + pieces);
+                    productRepository.save(product);
+                } else{
                     cart.remove(product.getId());
+                    product.setQuantity(product.getQuantity() + quantity);
+                    productRepository.save(product);
                 }
+
             }
             session.setAttribute("cart", cart);
         }
