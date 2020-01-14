@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class UserDAO extends DAO {
 
     public void subscribe(long id) throws SQLException {
-        String sql = "UPDATE users SET is_subscribed = 1 WHERE id = ?;";
+        String sql = "UPDATE users SET is_subscribed = true WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
@@ -24,7 +24,7 @@ public class UserDAO extends DAO {
     }
 
     public void unsubscribe(long id) throws SQLException {
-        String sql = "UPDATE users SET is_subscribed = 0 WHERE id = ?;";
+        String sql = "UPDATE users SET is_subscribed = false WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
@@ -41,7 +41,7 @@ public class UserDAO extends DAO {
         }
     }
 
-    public boolean is_admin(User user) throws SQLException {
+    public boolean isAdmin(User user) throws SQLException {
         String sql = "SELECT is_admin FROM petshop.users WHERE id = ?";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

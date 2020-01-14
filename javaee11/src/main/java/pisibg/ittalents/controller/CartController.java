@@ -2,7 +2,6 @@ package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.exception.*;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.pojo.Address;

@@ -3,7 +3,6 @@ package pisibg.ittalents.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.NotFoundException;
@@ -42,17 +41,26 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("An account with this email exists.Please, log in");
         }
         String pass = user.getPassword();
-        String confirmPass = dto.getConfirmationPassword();
+        String confirmPass;
+        if (Authenticator.isValidPassword(pass)) {
+            confirmPass = dto.getConfirmationPassword();
+        } else {
+            throw new AuthorizationException("Password should be: at least 8 symbols long. " +
+                    "Contain at least one digit. " +
+                    "Contain at least one upper case character. " +
+                    "No spaces are allowed");
+        }
         if (Authenticator.validateConfirmPassword(pass, confirmPass)) {
             user.setPassword(Authenticator.encodePassword(pass));
             SessionManager.logInUser(session, user);
-            user.set_subscribed(true);
+            user.setSubscribed(true);
             userRepository.save(user);
         } else {
             throw new AuthorizationException("Password should be the same as confirm password ");
         }
         return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
+
 
     @PostMapping("/users/login")
     public HiddenPasswordUserDTO login(@RequestBody LoginUserDTO loginUser, HttpSession session) {
@@ -75,44 +83,43 @@ public class UserController extends AbstractController {
     }
 
     @PutMapping("/users/unsubscribe")
-    public ResponseEntity<String> unsubscribe(HttpSession session) throws SQLException {
+    public ResponseEntity<HiddenPasswordUserDTO> unsubscribe(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        if (user.is_subscribed()) {
+        if (user.isSubscribed()) {
             userDao.unsubscribe(user.getId());
+            user.setSubscribed(false);
         }
-        return new ResponseEntity<>("User unsubscribed successfully!", HttpStatus.OK);
+        return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
 
     @PutMapping("/users/subscribe")
-    public ResponseEntity<String> subscribe(HttpSession session) throws SQLException {
+    public ResponseEntity<HiddenPasswordUserDTO> subscribe(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        if (user.is_subscribed()) {
+        if (user.isSubscribed()) {
             throw new AuthorizationException("You are already subscribed");
         }
         userDao.subscribe(user.getId());
-        return new ResponseEntity<>("User subscribed successfully!", HttpStatus.OK);
+        user.setSubscribed(true);
+        return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
 
-    @PostMapping("/users/{id}")//TODO
-    public ResponseEntity<String> addAddress(@RequestBody AddressDTO addressDTO,
-                                             @PathVariable("id") Long id, HttpSession session) {
+    @PostMapping("/addresses")
+    public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO,
+                                                 HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        Address address = new Address();
-        address.setCity(addressDTO.getCity());
-        address.setAddress_text(addressDTO.getAddress_text());
-        address.setPostal_code(addressDTO.getPostal_code());
+        Address address = new Address(addressDTO);
         address.addAddressToUser(user);
         addressRepository.save(address);
-        return new ResponseEntity<>("You have added an address", HttpStatus.OK);
+        return new ResponseEntity<>(new AddressDTO(address), HttpStatus.OK);
     }
 
 
@@ -125,7 +132,7 @@ public class UserController extends AbstractController {
         }
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/addresses/{id}")
     public ResponseEntity<String> deleteAddress(@PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
@@ -133,30 +140,30 @@ public class UserController extends AbstractController {
         }
         Address address = findAddressById(id);
         if (!user.getAddresses().contains(address)) {
-            throw new AuthorizationException("Yoy are not authorized delete this address");
+            throw new NotFoundException("Address not found");
         }
         address.removeAddressToUser(user);
         addressRepository.delete(address);
         return new ResponseEntity<>("You have deleted an address", HttpStatus.OK);
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<String> editAddress(@RequestBody AddressDTO addressDTO,
-                                              @PathVariable("id") Long id, HttpSession session) {
+    @PutMapping("/addresses/{id}")
+    public ResponseEntity<AddressDTO> editAddress(@RequestBody AddressDTO addressDTO,
+                                                  @PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
         Address address = findAddressById(id);
         if (!user.getAddresses().contains(address)) {
-            throw new AuthorizationException("Yoy are not authorized delete this address");
+            throw new NotFoundException("Address not found");
         }
         address.setCity(addressDTO.getCity());
         address.setAddress_text(addressDTO.getAddress_text());
         address.setPostal_code(addressDTO.getPostal_code());
         address.addAddressToUser(user);
         addressRepository.save(address);
-        return new ResponseEntity<>("You have edited your address", HttpStatus.OK);
+        return new ResponseEntity<>(new AddressDTO(address), HttpStatus.OK);
     }
 }
 

@@ -2,6 +2,7 @@ package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import pisibg.ittalents.model.dto.AddressDTO;
 
 import javax.persistence.*;
 import java.util.*;
@@ -37,6 +38,14 @@ public class Address {
     public void removeAddressToUser(User user) {
         usersAddresses.remove(user);
         user.getAddresses().remove(this);
+    }
+
+
+    public Address(AddressDTO address) {
+        setCity(address.getCity());
+        setAddress_text(address.getAddress_text());
+        setPostal_code(address.getPostal_code());
+
     }
 
     @Override
