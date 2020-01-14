@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.dao.OrderDAO;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.NotFoundException;

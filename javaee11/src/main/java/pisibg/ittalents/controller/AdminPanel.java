@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.dao.DiscountDAO;
 import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
@@ -40,7 +39,7 @@ public class AdminPanel extends AbstractController {
         if (user == null) {
             throw new AuthorizationException("You have to log in");
         }
-        if (user.is_admin()) {
+        if (user.isAdmin()) {
             return userRepository.findAll();
         } else {
             throw new AuthorizationException("You are not authorized");
@@ -64,7 +63,7 @@ public class AdminPanel extends AbstractController {
             throw new AuthorizationException("You need to log in first");
         }
         if (SessionManager.isLogged(session)) {
-            if (!findUserById(user.getId()).is_admin()) { //TODO check
+            if (!findUserById(user.getId()).isAdmin()) { //TODO check
                 throw new AuthorizationException("You are not authorized");
             }
             userRepository.deleteById(id);
@@ -84,7 +83,7 @@ public class AdminPanel extends AbstractController {
         }
 
         if (SessionManager.isLogged(session)) {
-            if (!findUserById(user.getId()).is_admin()) { //TODO check
+            if (!findUserById(user.getId()).isAdmin()) { //TODO check
                 throw new AuthorizationException("You are not authorized");
             }
 
@@ -110,7 +109,7 @@ public class AdminPanel extends AbstractController {
         }
 
         if (SessionManager.isLogged(session)) {
-            if (!findUserById(user.getId()).is_admin()) { //TODO check
+            if (!findUserById(user.getId()).isAdmin()) { //TODO check
                 throw new AuthorizationException("You are not authorized");
             }
             // get discount id and add it to products which are from certain category

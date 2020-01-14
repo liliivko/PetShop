@@ -28,11 +28,12 @@ public class User {
     @Column
     private String email;
     @Column
+    @JsonIgnore
     private String password;
     @Column
-    private boolean is_admin;
+    private boolean isAdmin;
     @Column
-    private boolean is_subscribed;
+    private boolean isSubscribed;
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Order> orders;
@@ -46,7 +47,7 @@ public class User {
         setGender(dto.getGender());
         setEmail(dto.getEmail());
         setPassword(dto.getPassword());
-        set_subscribed(true);
+        setSubscribed(true);
     }
 
     @Override
