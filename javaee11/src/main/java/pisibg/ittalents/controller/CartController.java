@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.exception.*;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
+import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
 import pisibg.ittalents.model.pojo.Address;
 import pisibg.ittalents.model.pojo.Order;
 import pisibg.ittalents.model.pojo.User;
@@ -16,6 +17,7 @@ import pisibg.ittalents.model.pojo.Product;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +98,7 @@ public class CartController extends AbstractController {
     }
 
     @GetMapping(value = "myCart")
-    public ArrayList<ProductFromCartDTO> viewCart(HttpSession session, HttpServletResponse response) {
+    public ArrayList<ProductWithCurrentPriceDTO> viewCart(HttpSession session, HttpServletResponse response) throws SQLException {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
@@ -105,10 +107,11 @@ public class CartController extends AbstractController {
         } else {
             double totalPrice = 0;
             HashMap<Long, Integer> cart = (HashMap<Long, Integer>) session.getAttribute("cart");
-            ArrayList<ProductFromCartDTO> cartToview = new ArrayList<>();
+            ArrayList<ProductWithCurrentPriceDTO> cartToview = new ArrayList<>();
             for (Map.Entry e: cart.entrySet()) {
-                cartToview.add(new ProductFromCartDTO(productRepository.getOne((Long)e.getKey()), (Integer)e.getValue()));
-                totalPrice += productRepository.getOne((Long)e.getKey()).getPrice()*(Integer)e.getValue();
+                ProductWithCurrentPriceDTO productInCart = new ProductWithCurrentPriceDTO(productRepository.getOne((Long)e.getKey()), (Integer)e.getValue());
+                cartToview.add(productInCart);
+                totalPrice += productInCart.getPrice()*productInCart.getQuantity();
             }
             response.setHeader("total price", String.valueOf(totalPrice));
             return cartToview;

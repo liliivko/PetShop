@@ -7,15 +7,22 @@ import org.springframework.web.bind.annotation.RestController;
 import pisibg.ittalents.SessionManager;
 import pisibg.ittalents.dao.OrderDAO;
 import pisibg.ittalents.exception.AuthorizationException;
+import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.exception.OrderNotFoundException;
 import pisibg.ittalents.model.dto.OrdersByUserDTO;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
+import pisibg.ittalents.model.dto.ProductWithOrderPriceDTO;
 import pisibg.ittalents.model.pojo.Order;
+import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.OrderRepository;
+import pisibg.ittalents.model.repository.ProductRepository;
+
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class OrderController extends AbstractController{
@@ -24,9 +31,11 @@ public class OrderController extends AbstractController{
     OrderDAO orderDao;
     @Autowired
     OrderRepository orderRepository;
+    @Autowired
+    ProductRepository productRepository;
 
     @GetMapping(value = "viewOrder/{id}")
-    public List<ProductFromCartDTO> view(@PathVariable("id") long orderId, HttpSession session) throws SQLException {
+    public List<ProductWithOrderPriceDTO> view(@PathVariable("id") long orderId, HttpSession session) throws SQLException {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
@@ -39,7 +48,19 @@ public class OrderController extends AbstractController{
             throw new AuthorizationException("You are not authorized to view this order.");
         }
         else {
-            return orderDao.getProductsFromOrder(order);
+            List <ProductFromCartDTO> pfc= orderDao.getProductsFromOrder(order);
+            List<ProductWithOrderPriceDTO> products = new ArrayList<>();
+            for (ProductFromCartDTO p:pfc                 ) {
+                Optional<Product> product = productRepository.findById(p.getId());
+                if(product.isPresent()){
+                    Product pr = product.get();
+                    products.add(new ProductWithOrderPriceDTO(pr, order));
+                }
+                else{
+                    throw new NotFoundException("Product not found");
+                }
+            }
+            return products;
         }
     }
 
@@ -49,7 +70,6 @@ public class OrderController extends AbstractController{
             throw new AuthorizationException("You have to log in first");
         }
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
-
         List <OrdersByUserDTO> orders = orderDao.getAllOrdersByUser(user);
         return orders;
     }

@@ -9,6 +9,7 @@ import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.pojo.Discount;
 import pisibg.ittalents.model.pojo.Subcategory;
@@ -77,6 +78,7 @@ public class Product implements Serializable {
         setDiscount(null);
         setDate(LocalDate.now());
     }
+
 
     @Override
     public boolean equals(Object o) {

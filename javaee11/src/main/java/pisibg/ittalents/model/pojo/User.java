@@ -2,6 +2,7 @@ package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Component
 @Entity(name = "User")
 @Table(name = "users")
 public class User {
