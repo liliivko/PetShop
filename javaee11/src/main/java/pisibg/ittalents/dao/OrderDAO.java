@@ -38,18 +38,23 @@ public class OrderDAO extends DAO {
             "WHERE o.user_id = ?\n" +
             "GROUP BY o.id;";
 
-    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, p.price, op.quantity, p.description, s.name as subcategory, c.name, s.id, c.id\n" +
-            "            FROM orders AS o\n" +
-            "            JOIN order_has_product AS op \n" +
-            "            ON order_id = o.id \n" +
-            "            JOIN products AS p \n" +
-            "            ON product_id = p.id\n" +
-            "            JOIN subcategories as s\n" +
-            "            ON s.id = p.subcategory_id\n" +
-            "            JOIN categories as c\n" +
-            "            ON c.id = s.category_id\n" +
-            "            WHERE order_id = ? \n" +
-            "            GROUP BY product_id";
+    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, \n" +
+            "IF((p.discount_id is not null AND d.date_from<o.created_on \n" +
+            "AND d.date_to>o.created_on), p.price*(1-d.amount/100) ,p.price)\n" +
+            "AS price, op.quantity, p.description, s.name as subcategory, c.name, s.id, c.id\n" +
+            "FROM orders AS o\n" +
+            "JOIN order_has_product AS op \n" +
+            "ON order_id = o.id \n" +
+            "JOIN products AS p \n" +
+            "ON product_id = p.id\n" +
+            "JOIN subcategories as s\n" +
+            "ON s.id = p.subcategory_id\n" +
+            "JOIN categories as c\n" +
+            "ON c.id = s.category_id\n" +
+            "LEFT OUTER JOIN discounts AS d\n" +
+            "ON d.id = p.discount_id\n" +
+            "WHERE order_id = ?\n" +
+            "GROUP BY product_id";
 
 
     public List<ProductFromCartDTO> getProductsFromOrder (Order order) throws SQLException{
@@ -63,7 +68,10 @@ public class OrderDAO extends DAO {
                 product.setId(rows.getLong("product_id"));
                 product.setQuantity(rows.getInt("quantity"));
                 product.setName(rows.getString("p.name"));
-                product.setPrice(rows.getDouble("price"));
+                double price = rows.getDouble("price");
+                DecimalFormat df = new DecimalFormat("#.##");
+                price = Double.parseDouble(df.format(price));
+                product.setPrice(price);
                 product.setDescription(rows.getString("description"));
                 product.setCategoryName(rows.getString("c.name"));
                 product.setSubcategoryName(rows.getString("subcategory"));

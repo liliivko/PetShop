@@ -11,6 +11,7 @@ import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.repository.SubcategoryRepository;
+import utils.SessionManager;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
@@ -29,8 +30,6 @@ public class ProductController extends AbstractController {
 
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private SubcategoryRepository subcategoryRepository;
 
     @GetMapping(value = "/products/all")
     public List<ProductWithCurrentPriceDTO> getAll() throws SQLException {
@@ -63,25 +62,6 @@ public class ProductController extends AbstractController {
             return productsWithPrices;
         } else {
             throw new ProductNotFoundException("Product not found!");
-        }
-    }
-
-    @PostMapping(value = "/products/")
-    public ProductWithCurrentPriceDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO) throws SQLException {
-        //TODO validate properties!
-        regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
-        Product product = new Product(regularPriceProductDTO);
-        productRepository.save(product);
-        return new ProductWithCurrentPriceDTO(product);
-    }
-
-    @DeleteMapping(value = "/products/{id}")
-    public void removeProduct(@PathVariable("id") long id, HttpServletResponse resp) {
-        if (!productRepository.existsById(id)) {
-            resp.setStatus(404);
-        } else {
-            productRepository.deleteById(id);
-            resp.setStatus(200);
         }
     }
 
@@ -162,38 +142,5 @@ public class ProductController extends AbstractController {
         }
     }
 
-    @PostMapping("/product/{id}/pictures")
-    public ProductWithCurrentPriceDTO addPicture(@RequestPart(value = "picture") MultipartFile multipartFile, @PathVariable("id") long id,
-                                 HttpSession session) throws IOException, SQLException {
-        if (!SessionManager.isLogged(session)) {
-            throw new AuthorizationException("You have to log in first");}
-        Product product = productRepository.getOne(id);
-        String path = "C://Users//User//NewRepo//PetShop//pictures//";
-        String pictureName = getNameForUpload(multipartFile.getOriginalFilename(), product);
-        File picture = new File(path + pictureName);
-        FileOutputStream fos = new FileOutputStream(picture);
-        fos.write(multipartFile.getBytes());
-        fos.close();
-        String mimeType = new MimetypesFileTypeMap().getContentType(picture);
-        if(!mimeType.substring(0, 5).equalsIgnoreCase("image")){
-            picture.delete();
-            throw new BadRequestException("Only pictures allowed.");
-        }
-        product.setImage(pictureName);
-        productRepository.save(product);
-        return new ProductWithCurrentPriceDTO(product);
-    }
-
-    private static String getNameForUpload(String name, Product product){
-        String[] all = name.split("\\.", 2);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd-hh-mm-ss");
-        LocalDateTime localDateTime = LocalDateTime.now();
-        String parse = localDateTime.format(dateTimeFormatter);
-        String nameWithoutId = all[0];
-        String formatForPicture = all[1];
-        String nameWithId = nameWithoutId + "_" + parse + "_" + product.getId() +  "." + formatForPicture;
-        System.out.println(name);
-        return nameWithId;
-    }
 }
 

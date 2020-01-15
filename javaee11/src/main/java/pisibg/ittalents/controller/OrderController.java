@@ -1,5 +1,4 @@
 package pisibg.ittalents.controller;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +17,7 @@ import pisibg.ittalents.model.repository.OrderRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import utils.SessionManager;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class OrderController extends AbstractController{
     ProductRepository productRepository;
 
     @GetMapping(value = "viewOrder/{id}")
-    public List<ProductWithOrderPriceDTO> view(@PathVariable("id") long orderId, HttpSession session) throws SQLException {
+    public List<ProductWithOrderPriceDTO> view(@PathVariable("id") long orderId, HttpSession session, HttpServletResponse response) throws SQLException {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
@@ -50,16 +50,20 @@ public class OrderController extends AbstractController{
         else {
             List <ProductFromCartDTO> pfc= orderDao.getProductsFromOrder(order);
             List<ProductWithOrderPriceDTO> products = new ArrayList<>();
-            for (ProductFromCartDTO p:pfc                 ) {
+            double totalPrice = 0;
+            for (ProductFromCartDTO p:pfc) {
                 Optional<Product> product = productRepository.findById(p.getId());
                 if(product.isPresent()){
+                    totalPrice += p.getPrice()*p.getQuantity();
                     Product pr = product.get();
                     products.add(new ProductWithOrderPriceDTO(pr, order));
+
                 }
                 else{
                     throw new NotFoundException("Product not found");
                 }
             }
+            response.setHeader("total price", String.valueOf(totalPrice));
             return products;
         }
     }

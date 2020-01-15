@@ -4,20 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pisibg.ittalents.dao.DiscountDAO;
 import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
+import pisibg.ittalents.exception.BadRequestException;
 import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.model.dto.DiscountDTO;
+import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
+import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.pojo.Discount;
+import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
-import pisibg.ittalents.model.repository.AddressRepository;
-import pisibg.ittalents.model.repository.DiscountRepository;
-import pisibg.ittalents.model.repository.UserRepository;
+import pisibg.ittalents.model.repository.*;
 import utils.SessionManager;
 
+import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,13 +36,47 @@ public class AdminPanel extends AbstractController {
     @Autowired
     private DiscountDAO discountDAO;
     @Autowired
-    private UserDAO userDao;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     AddressRepository addressRepository;
     @Autowired
     DiscountRepository discountRepository;
+    @Autowired
+    SubcategoryRepository subcategoryRepository;
+    @Autowired
+    ProductRepository productRepository;
+
+    @PostMapping(value = "/products/")
+    public ProductWithCurrentPriceDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO, HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (user == null) {
+            throw new AuthorizationException("You have to log in");
+        }
+        if (!findUserById(user.getId()).isAdmin()) {
+            throw new AuthorizationException("You are not authorized");
+        }
+        //TODO validate properties!
+        regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
+        Product product = new Product(regularPriceProductDTO);
+        productRepository.save(product);
+        return new ProductWithCurrentPriceDTO(product);
+    }
+
+    @DeleteMapping(value = "/products/{id}")
+    public void removeProduct(@PathVariable("id") long id, HttpSession session) {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (user == null) {
+            throw new AuthorizationException("You have to log in");
+        }
+        if (!findUserById(user.getId()).isAdmin()) {
+            throw new AuthorizationException("You are not authorized");
+        }
+        if (!productRepository.existsById(id)) {
+            throw new NotFoundException("The product doesn't exist.");
+        } else {
+            productRepository.deleteById(id);
+        }
+    }
 
     @GetMapping(value = "/users/all")
     public List<User> getAllUsers(HttpSession session) throws SQLException {
@@ -117,5 +161,43 @@ public class AdminPanel extends AbstractController {
             discountDAO.applyDiscount(discountId,subcategoryId);
         }
         return new ResponseEntity<>("Discount added", HttpStatus.CREATED);
+    }
+
+    @PostMapping("/product/{id}/pictures")
+    public ProductWithCurrentPriceDTO addPicture(@RequestPart(value = "picture") MultipartFile multipartFile, @PathVariable("id") long id,
+                                                 HttpSession session) throws IOException, SQLException {
+        if (!SessionManager.isLogged(session)) {
+            throw new AuthorizationException("You have to log in first");}
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (!findUserById(user.getId()).isAdmin()) {
+            throw new AuthorizationException("You are not authorized");
+        }
+        Product product = productRepository.getOne(id);
+        String path = "C://Users//User//NewRepo//PetShop//pictures//";
+        String pictureName = getNameForUpload(multipartFile.getOriginalFilename(), product);
+        File picture = new File(path + pictureName);
+        FileOutputStream fos = new FileOutputStream(picture);
+        fos.write(multipartFile.getBytes());
+        fos.close();
+        String mimeType = new MimetypesFileTypeMap().getContentType(picture);
+        if(!mimeType.substring(0, 5).equalsIgnoreCase("image")){
+            picture.delete();
+            throw new BadRequestException("Only pictures allowed.");
+        }
+        product.setImage(pictureName);
+        productRepository.save(product);
+        return new ProductWithCurrentPriceDTO(product);
+    }
+
+    private static String getNameForUpload(String name, Product product){
+        String[] all = name.split("\\.", 2);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd-hh-mm-ss");
+        LocalDateTime localDateTime = LocalDateTime.now();
+        String parse = localDateTime.format(dateTimeFormatter);
+        String nameWithoutId = all[0];
+        String formatForPicture = all[1];
+        String nameWithId = nameWithoutId + "_" + parse + "_" + product.getId() +  "." + formatForPicture;
+        System.out.println(name);
+        return nameWithId;
     }
 }
