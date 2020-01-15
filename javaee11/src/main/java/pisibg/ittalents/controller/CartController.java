@@ -3,7 +3,6 @@ package pisibg.ittalents.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.*;
-import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
 import pisibg.ittalents.model.pojo.Address;
 import pisibg.ittalents.model.pojo.Order;
@@ -13,6 +12,7 @@ import pisibg.ittalents.model.repository.OrderRepository;
 import pisibg.ittalents.model.repository.PaymentMethodRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
+import utils.SessionManager;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;

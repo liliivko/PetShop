@@ -1,4 +1,4 @@
-package pisibg.ittalents.controller;
+package utils;
 
 
 import org.springframework.security.crypto.bcrypt.BCrypt;

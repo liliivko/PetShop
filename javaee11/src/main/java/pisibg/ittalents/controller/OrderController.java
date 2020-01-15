@@ -16,6 +16,7 @@ import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.OrderRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
+import utils.SessionManager;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;

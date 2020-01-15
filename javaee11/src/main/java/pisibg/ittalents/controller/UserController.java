@@ -15,6 +15,8 @@ import pisibg.ittalents.model.pojo.User;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.model.repository.AddressRepository;
 import pisibg.ittalents.model.repository.UserRepository;
+import utils.Authenticator;
+import utils.SessionManager;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
