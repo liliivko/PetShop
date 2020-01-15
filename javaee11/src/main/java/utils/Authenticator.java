@@ -15,7 +15,10 @@ public class Authenticator {
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     public static final Pattern VALID_PASSWORD = Pattern.compile("^(?!.* )(?=.*\\d)" +
-            "(?=.*[A-Z]).{8,15}$",Pattern.CASE_INSENSITIVE);
+            "(?=.*[A-Z]).{8,15}$");
+
+    //only alphabetical
+    public static final Pattern VALID_NAME = Pattern.compile("^[^\\d\\s]+$");
 
     public static boolean isEmailValid(String email) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
@@ -41,5 +44,14 @@ public class Authenticator {
         return passwordEncoder.encode(password);
     }
 
+    public static boolean isFirstNameValid(String firstName){
+        Matcher matcher=VALID_NAME.matcher(firstName);
+        return matcher.find();
+    }
+
+    public static boolean isLastNameValid(String lastName) {
+        Matcher matcher = VALID_NAME.matcher(lastName);
+        return matcher.find();
+    }
 
 }

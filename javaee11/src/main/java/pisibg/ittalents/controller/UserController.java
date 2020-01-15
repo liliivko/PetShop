@@ -33,7 +33,7 @@ public class UserController extends AbstractController {
     AddressRepository addressRepository;
 
     @PostMapping(value = "/users/register")
-    //TODO trim
+    //TODO trim validate first name, last name
     public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session) {
         User user = new User(dto);
         if (!Authenticator.isEmailValid(user.getEmail())) {
@@ -41,6 +41,10 @@ public class UserController extends AbstractController {
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new AuthorizationException("An account with this email exists.Please, log in");
+        }
+        if (!(Authenticator.isFirstNameValid(dto.getFirst_name()) ||
+                Authenticator.isLastNameValid(dto.getLast_name()))) {
+            throw new AuthorizationException("Your name should contain only alphabetical characters");
         }
         String pass = user.getPassword();
         String confirmPass;

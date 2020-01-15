@@ -1,6 +1,7 @@
 package pisibg.ittalents.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import pisibg.ittalents.exception.AuthorizationException;
@@ -45,7 +46,16 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
-    // not found
+    @ExceptionHandler(MailException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleMailException(Exception e) {
+        ErrorDTO errorDTO = new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
 
 
 

@@ -23,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 public class AdminPanel extends AbstractController {
+
     @Autowired
     private DiscountDAO discountDAO;
     @Autowired
@@ -30,9 +31,12 @@ public class AdminPanel extends AbstractController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    AddressRepository addressRepository;
+    private AddressRepository addressRepository;
     @Autowired
-    DiscountRepository discountRepository;
+    private DiscountRepository discountRepository;
+    @Autowired
+    private NotificationService notificationService;
+
 
     @GetMapping(value = "/users/all")
     public List<User> getAllUsers(HttpSession session) throws SQLException {
@@ -100,9 +104,9 @@ public class AdminPanel extends AbstractController {
 
     //TODO delete discount
     //todo CHECK LONG, return DTO
-    @PostMapping("applydiscount")
+    @PostMapping("applyDiscount")
     public ResponseEntity<String> applytoSubcategory(@RequestParam("discount_id") long discountId,
-                                                     @RequestParam("sucategory_id") long subcategoryId,
+                                                     @RequestParam("subcategory_id") long subcategoryId,
                                                      HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
@@ -110,12 +114,39 @@ public class AdminPanel extends AbstractController {
         }
 
         if (SessionManager.isLogged(session)) {
-            if (!findUserById(user.getId()).isAdmin()) { //TODO check
+            if (!findUserById(user.getId()).isAdmin()) {
                 throw new AuthorizationException("You are not authorized");
             }
-            // get discount id and add it to products which are from certain category
-            discountDAO.applyDiscount(discountId,subcategoryId);
+            Discount discount = getDiscountById(discountId);
+            if (discount != null) {
+                discountDAO.applyDiscount(discountId, subcategoryId);
+                informAllSubscribers(discount.getName());
+            }
         }
         return new ResponseEntity<>("Discount added", HttpStatus.CREATED);
     }
-}
+
+
+    public Discount getDiscountById(long discountId) {
+        Optional<Discount> discount = discountRepository.findById(discountId);
+        if (discount.isPresent()) {
+            return discount.get();
+        } else {
+            throw new NotFoundException("The resource you are trying to reach is not found");
+
+        }
+    }
+
+        //@GetMapping(value = "/inform/")
+        public void informAllSubscribers (String name){
+            List<User> subscribers = userRepository.findAllBySubscribedTrue();
+            for (User user : subscribers) {
+                Runnable runnable = () -> {
+                    notificationService.sendMail(user.getEmail(), name);
+                };
+                new Thread(runnable).start();
+            }
+        }
+
+
+    }
