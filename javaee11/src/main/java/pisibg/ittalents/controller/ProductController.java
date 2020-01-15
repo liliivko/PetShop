@@ -2,26 +2,13 @@ package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import pisibg.ittalents.exception.AuthorizationException;
-import pisibg.ittalents.exception.BadRequestException;
 import pisibg.ittalents.exception.ProductNotFoundException;
 import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
-import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
-import pisibg.ittalents.model.repository.SubcategoryRepository;
-import utils.SessionManager;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 

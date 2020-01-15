@@ -58,6 +58,21 @@ public class AdminPanel extends AbstractController {
         //TODO validate properties!
         regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
         Product product = new Product(regularPriceProductDTO);
+        if(product.getPrice() <= 0 ){
+            throw new BadRequestException("Price should not be negative or null. ");
+        }
+        if(!(subcategoryRepository.existsById(product.getSubcategory().getId()))){
+            throw new BadRequestException("You should select an existing category.");
+        }
+        if(product.getName().isEmpty() || product.getName() == null){
+            throw new BadRequestException("You should write a name for the product");
+        }
+        if(product.getQuantity() < 0 ){
+            throw new BadRequestException("Quantity should not have a negative value.");
+        }
+        if(product.getDescription().isEmpty() || product.getDescription() == null){
+            throw new BadRequestException("The description should not be empty.");
+        }
         productRepository.save(product);
         return new ProductWithCurrentPriceDTO(product);
     }
