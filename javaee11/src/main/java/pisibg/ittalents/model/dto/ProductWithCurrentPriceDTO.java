@@ -35,18 +35,16 @@ public class ProductWithCurrentPriceDTO {
     private String categoryName;
     private Discount discount;
 
-
-
     public ProductWithCurrentPriceDTO(Product product) throws SQLException {
         setId(product.getId());
         setName(product.getName());
         setPrice(setCurrentPrice(product));
         setQuantity(product.getQuantity());
         setDescription(product.getDescription());
-        setImage(product.getImage());
         setSubcategoryName(product.getSubcategory().getName());
         setCategoryName(product.getSubcategory().getCategory().getName());
         setDiscount(product.getDiscount());
+        setImage(product.getImage());
     }
 
     public ProductWithCurrentPriceDTO(Product product, int quantity) throws SQLException {
@@ -55,7 +53,6 @@ public class ProductWithCurrentPriceDTO {
         setPrice(setCurrentPrice(product));
         setQuantity(quantity);
         setDescription(product.getDescription());
-        setImage(product.getImage());
         setSubcategoryName(product.getSubcategory().getName());
         setCategoryName(product.getSubcategory().getCategory().getName());
         setDiscount(product.getDiscount());

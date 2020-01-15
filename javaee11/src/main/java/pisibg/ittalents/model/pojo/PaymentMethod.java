@@ -24,7 +24,7 @@ public class PaymentMethod {
     public PaymentMethod(String type) {
         this.type = type;
     }
-    public PaymentMethod(long id){
+    PaymentMethod(long id){
         this.id = id;
     }
 }

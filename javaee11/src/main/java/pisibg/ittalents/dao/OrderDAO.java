@@ -38,7 +38,7 @@ public class OrderDAO extends DAO {
             "WHERE o.user_id = ?\n" +
             "GROUP BY o.id;";
 
-    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, p.price, op.quantity, p.description, p.image, s.name as subcategory, c.name, s.id, c.id\n" +
+    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, p.price, op.quantity, p.description, s.name as subcategory, c.name, s.id, c.id\n" +
             "            FROM orders AS o\n" +
             "            JOIN order_has_product AS op \n" +
             "            ON order_id = o.id \n" +
@@ -67,7 +67,6 @@ public class OrderDAO extends DAO {
                 product.setDescription(rows.getString("description"));
                 product.setCategoryName(rows.getString("c.name"));
                 product.setSubcategoryName(rows.getString("subcategory"));
-                product.setImage(rows.getString("image"));
                 products.add(product);
             }
         }

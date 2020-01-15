@@ -2,6 +2,9 @@ package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import pisibg.ittalents.exception.AuthorizationException;
+import pisibg.ittalents.exception.BadRequestException;
 import pisibg.ittalents.exception.ProductNotFoundException;
 import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
 import pisibg.ittalents.model.dto.RegularPriceProductDTO;
@@ -9,13 +12,17 @@ import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.repository.SubcategoryRepository;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 
 @RestController
 public class ProductController extends AbstractController {
@@ -24,7 +31,6 @@ public class ProductController extends AbstractController {
     private ProductRepository productRepository;
     @Autowired
     private SubcategoryRepository subcategoryRepository;
-
 
     @GetMapping(value = "/products/all")
     public List<ProductWithCurrentPriceDTO> getAll() throws SQLException {
@@ -154,6 +160,40 @@ public class ProductController extends AbstractController {
         } else {
             throw new ProductNotFoundException("Products not found!");
         }
+    }
+
+    @PostMapping("/product/{id}/pictures")
+    public ProductWithCurrentPriceDTO addPicture(@RequestPart(value = "picture") MultipartFile multipartFile, @PathVariable("id") long id,
+                                 HttpSession session) throws IOException, SQLException {
+        if (!SessionManager.isLogged(session)) {
+            throw new AuthorizationException("You have to log in first");}
+        Product product = productRepository.getOne(id);
+        String path = "C://Users//User//NewRepo//PetShop//pictures//";
+        String pictureName = getNameForUpload(multipartFile.getOriginalFilename(), product);
+        File picture = new File(path + pictureName);
+        FileOutputStream fos = new FileOutputStream(picture);
+        fos.write(multipartFile.getBytes());
+        fos.close();
+        String mimeType = new MimetypesFileTypeMap().getContentType(picture);
+        if(!mimeType.substring(0, 5).equalsIgnoreCase("image")){
+            picture.delete();
+            throw new BadRequestException("Only pictures allowed.");
+        }
+        product.setImage(pictureName);
+        productRepository.save(product);
+        return new ProductWithCurrentPriceDTO(product);
+    }
+
+    private static String getNameForUpload(String name, Product product){
+        String[] all = name.split("\\.", 2);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd-hh-mm-ss");
+        LocalDateTime localDateTime = LocalDateTime.now();
+        String parse = localDateTime.format(dateTimeFormatter);
+        String nameWithoutId = all[0];
+        String formatForPicture = all[1];
+        String nameWithId = nameWithoutId + "_" + parse + "_" + product.getId() +  "." + formatForPicture;
+        System.out.println(name);
+        return nameWithId;
     }
 }
 

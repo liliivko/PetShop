@@ -1,6 +1,7 @@
 package pisibg.ittalents.model.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import pisibg.ittalents.model.pojo.Discount;
 import pisibg.ittalents.model.pojo.Subcategory;
 import pisibg.ittalents.model.repository.SubcategoryRepository;
 
+import javax.mail.Multipart;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -24,6 +26,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Component
 @Entity
 @Table(name = "products")
@@ -34,7 +37,7 @@ import java.util.*;
 public class Product implements Serializable {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
     @NaturalId
     private String name;
@@ -78,7 +81,6 @@ public class Product implements Serializable {
         setDiscount(null);
         setDate(LocalDate.now());
     }
-
 
     @Override
     public boolean equals(Object o) {
