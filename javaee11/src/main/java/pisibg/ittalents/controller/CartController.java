@@ -134,7 +134,7 @@ public class CartController extends AbstractController {
             throw new NotFoundException("Address not found. Please add address to your profile.");}
         Address ordersAddress = addressRepository.getOne(address);
         if (!(user.getAddresses().contains(ordersAddress))){
-            throw new AuthorizationException("You are not authorized to view this order.");
+            throw new AuthorizationException("You have to add the address to your addresses first");
         } else {
             HashMap<Long, Integer> cart = (HashMap<Long, Integer>) session.getAttribute("cart");
             HashMap<Product, Integer> cartToOrder = new HashMap<>();

@@ -4,27 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.ProductNotFoundException;
 import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
-import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
-import pisibg.ittalents.model.repository.SubcategoryRepository;
 
-import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 
 @RestController
 public class ProductController extends AbstractController {
 
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private SubcategoryRepository subcategoryRepository;
-
 
     @GetMapping(value = "/products/all")
     public List<ProductWithCurrentPriceDTO> getAll() throws SQLException {
@@ -57,25 +49,6 @@ public class ProductController extends AbstractController {
             return productsWithPrices;
         } else {
             throw new ProductNotFoundException("Product not found!");
-        }
-    }
-
-    @PostMapping(value = "/products/")
-    public ProductWithCurrentPriceDTO save(@RequestBody RegularPriceProductDTO regularPriceProductDTO) throws SQLException {
-        //TODO validate properties!
-        regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
-        Product product = new Product(regularPriceProductDTO);
-        productRepository.save(product);
-        return new ProductWithCurrentPriceDTO(product);
-    }
-
-    @DeleteMapping(value = "/products/{id}")
-    public void removeProduct(@PathVariable("id") long id, HttpServletResponse resp) {
-        if (!productRepository.existsById(id)) {
-            resp.setStatus(404);
-        } else {
-            productRepository.deleteById(id);
-            resp.setStatus(200);
         }
     }
 
@@ -155,5 +128,6 @@ public class ProductController extends AbstractController {
             throw new ProductNotFoundException("Products not found!");
         }
     }
+
 }
 

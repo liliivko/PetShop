@@ -36,7 +36,7 @@ public class RegularPriceProductDTO {
      setPrice(product.getPrice());
      setQuantity(product.getQuantity());
      setDescription(product.getDescription());
-     setImage(product.getImage());
      setSubcategoryId(product.getSubcategory().getId());
+     setImage(product.getImage());
     }
 }

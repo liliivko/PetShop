@@ -37,8 +37,8 @@ public class ProductFromCartDTO {
         setPrice(product.getPrice());
         setDescription(product.getDescription());
         setQuantity(quantity);
-        setImage(product.getImage());
         setSubcategoryName(product.getSubcategory().getName());
         setCategoryName(product.getSubcategory().getCategory().getName());
+        setImage(product.getImage());
     }
 }

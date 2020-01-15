@@ -30,10 +30,10 @@ public class ProductWithOrderPriceDTO {
         setPrice(setPriceWhenOrdered(product, order));
         setQuantity(product.getQuantity());
         setDescription(product.getDescription());
-        setImage(product.getImage());
         setSubcategoryName(product.getSubcategory().getName());
         setCategoryName(product.getSubcategory().getCategory().getName());
         setDiscount(setDiscountWhenOrdered(product, order));
+        setImage(product.getImage());
     }
 
     private double setPriceWhenOrdered(Product product, Order order) throws SQLException {
