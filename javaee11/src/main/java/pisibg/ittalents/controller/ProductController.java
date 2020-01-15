@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 @RestController
 public class ProductController extends AbstractController {
@@ -95,8 +97,6 @@ public class ProductController extends AbstractController {
         }
     }
 
-
-
     @GetMapping(value = "/products/price")
     public List<Product> getByMinAndMaxRegularPRice(@RequestParam("minPrice") double minPrice, @RequestParam("maxPrice") double maxPrice) throws ProductNotFoundException {
         List<Product> products = productRepository.findAllByPriceBetween(minPrice, maxPrice);
@@ -124,5 +124,36 @@ public class ProductController extends AbstractController {
         }
     }
 
+    @GetMapping(value = "/products/priceAscending")
+    public List<ProductWithCurrentPriceDTO> getAllByPriceAcs() throws ProductNotFoundException, SQLException {
+        List<Product> products = productRepository.findAll();
+        ArrayList<ProductWithCurrentPriceDTO> productsWithPrices = new ArrayList<>();
+        if (!(products.isEmpty())) {
+            for (Product p : products) {
+                ProductWithCurrentPriceDTO pwcp = new ProductWithCurrentPriceDTO(p);
+                productsWithPrices.add(pwcp);
+            }
+            productsWithPrices.sort((o1, o2) -> Double.compare(o1.getPrice(), o2.getPrice()));
+            return productsWithPrices;
+        } else {
+            throw new ProductNotFoundException("Products not found!");
+        }
+    }
+
+    @GetMapping(value = "/products/priceDescending")
+    public List<ProductWithCurrentPriceDTO> getAllByPriceDe() throws ProductNotFoundException, SQLException {
+        List<Product> products = productRepository.findAll();
+        ArrayList<ProductWithCurrentPriceDTO> productsWithPrices = new ArrayList<>();
+        if (!(products.isEmpty())) {
+            for (Product p : products) {
+                ProductWithCurrentPriceDTO pwcp = new ProductWithCurrentPriceDTO(p);
+                productsWithPrices.add(pwcp);
+            }
+            productsWithPrices.sort((o1, o2) -> Double.compare(o2.getPrice(), o1.getPrice()));
+            return productsWithPrices;
+        } else {
+            throw new ProductNotFoundException("Products not found!");
+        }
+    }
 }
 
