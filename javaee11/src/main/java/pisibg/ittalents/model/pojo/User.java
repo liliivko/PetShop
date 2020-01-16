@@ -33,7 +33,7 @@ public class User {
     @Column
     private boolean isAdmin;
     @Column
-    private boolean subscribed;
+    private Boolean subscribed;
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Order> orders;

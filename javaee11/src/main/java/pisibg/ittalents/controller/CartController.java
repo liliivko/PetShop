@@ -3,6 +3,7 @@ package pisibg.ittalents.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.*;
+import pisibg.ittalents.model.dto.OrdersByUserDTO;
 import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
 import pisibg.ittalents.model.pojo.Address;
 import pisibg.ittalents.model.pojo.Order;
@@ -33,7 +34,7 @@ public class CartController extends AbstractController {
     AddressRepository addressRepository;
 
     @PostMapping(value = "buy/{id}/quantity/{pieces}") // + quantity also from the url? 1 by default?
-    public void addToCart(@PathVariable("id") long productId, @PathVariable("pieces") int pieces, HttpSession session) {
+    public ProductWithCurrentPriceDTO addToCart(@PathVariable("id") long productId, @PathVariable("pieces") int pieces, HttpSession session) throws SQLException {
         if(!(productRepository.findById(productId).isPresent())){
             throw new ProductNotFoundException("Product not found.");
         }
@@ -45,6 +46,9 @@ public class CartController extends AbstractController {
             HashMap<Long, Integer> cart = new HashMap<>();
             cart.put(product.getId(), pieces);
             session.setAttribute("cart", cart);
+              ProductWithCurrentPriceDTO productWithCurrentPriceDTO = new ProductWithCurrentPriceDTO(product);
+              productWithCurrentPriceDTO.setQuantity(pieces);
+              return productWithCurrentPriceDTO;
         } else {
               HashMap<Long, Integer> cart = (HashMap<Long, Integer>) session.getAttribute("cart");
               if (cart.containsKey(product.getId())) {
@@ -62,6 +66,11 @@ public class CartController extends AbstractController {
                   productRepository.save(product);
               }
               session.setAttribute("cart", cart);
+              HashMap<ProductWithCurrentPriceDTO, Integer> cartToReturn = new HashMap<>();
+              cartToReturn.put(new ProductWithCurrentPriceDTO(product), pieces);
+              ProductWithCurrentPriceDTO productWithCurrentPriceDTO = new ProductWithCurrentPriceDTO(product);
+              productWithCurrentPriceDTO.setQuantity(pieces);
+              return productWithCurrentPriceDTO;
           }
         }
     }
@@ -120,12 +129,13 @@ public class CartController extends AbstractController {
     //TODO - by session invalidation (logout, dies, restart) - DB should be updated with the quantities from all the carts!
 
     @PostMapping(value = "checkout/paymentmethod/{paymentmethod}/address/{address}")
-    public void checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod,
-                         @PathVariable("address") long address) {
+    public OrdersByUserDTO checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod,
+                                    @PathVariable("address") long address) {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        Order order = new Order();
         if (session.getAttribute("cart") == null) {
             throw new EmptyCartException("Cart is empty, nothing to order.");}
         if(!(paymentMethodRepository.existsById(paymentMethod))){
@@ -141,7 +151,7 @@ public class CartController extends AbstractController {
             for (Map.Entry e: cart.entrySet()) {
                 cartToOrder.put(productRepository.getOne((Long)e.getKey()), (Integer)e.getValue());
             }
-            Order order = new Order(user, cartToOrder, paymentMethod, ordersAddress);
+            order = new Order(user, cartToOrder, paymentMethod, ordersAddress);
             for (Map.Entry e: cartToOrder.entrySet()) {
                 order.addProduct((Product)e.getKey());
             }
@@ -149,6 +159,8 @@ public class CartController extends AbstractController {
             user.getOrders().add(order);
             cart.clear();
         }
+        order.getPaymentMethod().setType(paymentMethodRepository.getOne(paymentMethod).getType());
+        return new OrdersByUserDTO(order);
     }
 
 }

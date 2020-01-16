@@ -96,7 +96,7 @@ public class UserController extends AbstractController {
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        if (user.isSubscribed()) {
+        if (user.getSubscribed()) {
             userDao.unsubscribe(user.getId());
             user.setSubscribed(false);
         }
@@ -109,7 +109,7 @@ public class UserController extends AbstractController {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        if (user.isSubscribed()) {
+        if (user.getSubscribed()) {
             throw new BadRequestException("You are already subscribed");
         }
         userDao.subscribe(user.getId());

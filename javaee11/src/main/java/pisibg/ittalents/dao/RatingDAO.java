@@ -1,13 +1,7 @@
 package pisibg.ittalents.dao;
 
 import org.springframework.stereotype.Component;
-import pisibg.ittalents.model.dto.OrdersByUserDTO;
-import pisibg.ittalents.model.dto.ProductFromCartDTO;
 import pisibg.ittalents.model.dto.ProductWithRatingDTO;
-import pisibg.ittalents.model.pojo.Order;
-import pisibg.ittalents.model.pojo.PaymentMethod;
-import pisibg.ittalents.model.pojo.Status;
-import pisibg.ittalents.model.pojo.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

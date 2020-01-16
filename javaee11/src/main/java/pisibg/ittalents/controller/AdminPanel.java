@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -38,8 +39,6 @@ public class AdminPanel extends AbstractController {
     private DiscountDAO discountDAO;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private AddressRepository addressRepository;
     @Autowired
     private DiscountRepository discountRepository;
     @Autowired
@@ -193,7 +192,7 @@ public class AdminPanel extends AbstractController {
         }
         Product product = productRepository.getOne(id);
         String path = "C://Users//User//NewRepo//PetShop//pictures//";
-        String pictureName = getNameForUpload(multipartFile.getOriginalFilename(), product);
+        String pictureName = getNameForUpload(Objects.requireNonNull(multipartFile.getOriginalFilename()), product);
         File picture = new File(path + pictureName);
         FileOutputStream fos = new FileOutputStream(picture);
         fos.write(multipartFile.getBytes());
@@ -221,7 +220,7 @@ public class AdminPanel extends AbstractController {
     }
 
 
-    public Discount getDiscountById(long discountId) {
+    private Discount getDiscountById(long discountId) {
         Optional<Discount> discount = discountRepository.findById(discountId);
         if (discount.isPresent()) {
             return discount.get();
@@ -230,7 +229,7 @@ public class AdminPanel extends AbstractController {
         }
     }
 
-    public void informAllSubscribers(String name) {
+    private void informAllSubscribers(String name) {
         List<User> subscribers = userRepository.findAllBySubscribedTrue();
         for (User user : subscribers) {
             Runnable runnable = () -> {

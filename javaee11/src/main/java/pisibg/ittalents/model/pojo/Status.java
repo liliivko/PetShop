@@ -20,10 +20,11 @@ public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String statusName;
+    @Column
+    private String name;
 
     public Status(String statusName) {
-        this.statusName = statusName;
+        this.name = statusName;
     }
 
     public Status(long id){

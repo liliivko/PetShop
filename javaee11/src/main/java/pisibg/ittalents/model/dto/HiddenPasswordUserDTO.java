@@ -23,6 +23,6 @@ public class HiddenPasswordUserDTO {
         setLast_name(user.getLast_name());
         setGender(user.getGender());
         setEmail(user.getEmail());
-        setSubscribed(user.isSubscribed());
+        setSubscribed(user.getSubscribed());
     }
 }
