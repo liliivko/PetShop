@@ -9,8 +9,10 @@ import pisibg.ittalents.exception.EmptyCartException;
 import pisibg.ittalents.exception.PreconditionFailException;
 import pisibg.ittalents.model.dto.ErrorDTO;
 
+import javax.mail.MessagingException;
 import javax.persistence.RollbackException;
 import javax.validation.ConstraintViolationException;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -49,7 +51,7 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
-    @ExceptionHandler(MailException.class)
+    @ExceptionHandler({MailException.class, MessagingException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDTO handleMailException(Exception e) {
         ErrorDTO errorDTO = new ErrorDTO(
@@ -93,5 +95,15 @@ public abstract class AbstractController {
         return errorDTO;
     }
 
+    @ExceptionHandler(SocketException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleMailError(Exception e) {
+        ErrorDTO errorDTO = new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
 
 }

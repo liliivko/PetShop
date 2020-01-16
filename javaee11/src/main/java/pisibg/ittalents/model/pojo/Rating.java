@@ -38,9 +38,5 @@ public class Rating {
     private int rating_stars;
 
 
-    public Rating(Rating dto) {
-        setRating_text(dto.rating_text);
-        setRating_stars(dto.rating_stars);
-    }
 }
 
