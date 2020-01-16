@@ -5,6 +5,7 @@ import lombok.*;
 import pisibg.ittalents.model.dto.AddressDTO;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Setter
@@ -12,15 +13,17 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//TODO table - database
 @Table(name = "addresses")
 
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @NotBlank(message = "City may not be blank")
     private String city;
+    @NotBlank(message = "Address may not be blank")
     private String address_text;
+    @NotBlank(message = "Postal_code may not be blank")
     private String postal_code;
 
     @ManyToMany(cascade = CascadeType.MERGE,
@@ -45,7 +48,6 @@ public class Address {
         setCity(address.getCity());
         setAddress_text(address.getAddress_text());
         setPostal_code(address.getPostal_code());
-
     }
 
     @Override

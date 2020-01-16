@@ -3,11 +3,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.repository.RatingRepository;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -28,7 +31,10 @@ public class Rating {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private Product product;
+    @NotBlank(message = "This field should not be blank")
     private String rating_text;
+    @NotNull(message = "This field should not be null")
+    @Range(min = 1, max = 5)
     private int rating_stars;
 
 

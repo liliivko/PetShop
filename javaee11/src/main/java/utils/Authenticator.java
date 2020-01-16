@@ -6,19 +6,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.pojo.User;
 
+import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Authenticator {
 
+    public static final Pattern VALID_ADDRESS = Pattern.compile("^[a-zA-Z]*$");
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     public static final Pattern VALID_PASSWORD = Pattern.compile("^(?!.* )(?=.*\\d)" +
             "(?=.*[A-Z]).{8,15}$");
 
-    //only alphabetical
-    public static final Pattern VALID_NAME = Pattern.compile("^[^\\d\\s]+$");
+    //only alphabetical, no whitespace
+    public static final Pattern VALID_NAME = Pattern.compile("^[a-zA-Z]*$");
+
 
     public static boolean isEmailValid(String email) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
@@ -44,8 +47,8 @@ public class Authenticator {
         return passwordEncoder.encode(password);
     }
 
-    public static boolean isFirstNameValid(String firstName){
-        Matcher matcher=VALID_NAME.matcher(firstName);
+    public static boolean isFirstNameValid(String firstName) {
+        Matcher matcher = VALID_NAME.matcher(firstName);
         return matcher.find();
     }
 
@@ -53,5 +56,15 @@ public class Authenticator {
         Matcher matcher = VALID_NAME.matcher(lastName);
         return matcher.find();
     }
+
+    public static boolean isCityValid(String city) {
+        Matcher matcher = VALID_NAME.matcher(city);
+        return matcher.find();
+    }
+
+    public static boolean dateValid(LocalDateTime date1, LocalDateTime date2) {
+        return date2.isAfter(date1);
+    }
+
 
 }

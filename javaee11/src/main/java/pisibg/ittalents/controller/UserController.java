@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pisibg.ittalents.dao.UserDAO;
 import pisibg.ittalents.exception.AuthorizationException;
+import pisibg.ittalents.exception.BadRequestException;
 import pisibg.ittalents.exception.NotFoundException;
+import pisibg.ittalents.exception.PreconditionFailException;
 import pisibg.ittalents.model.dto.AddressDTO;
 import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.LoginUserDTO;
@@ -33,25 +35,25 @@ public class UserController extends AbstractController {
     AddressRepository addressRepository;
 
     @PostMapping(value = "/users/register")
-    //TODO trim validate first name, last name
-    public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session) {
+    public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session)
+            throws PreconditionFailException {
         User user = new User(dto);
         if (!Authenticator.isEmailValid(user.getEmail())) {
-            throw new AuthorizationException("Email should be valid");
+            throw new PreconditionFailException("Email should be valid");
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new AuthorizationException("An account with this email exists.Please, log in");
         }
-        if (!(Authenticator.isFirstNameValid(dto.getFirst_name()) ||
-                Authenticator.isLastNameValid(dto.getLast_name()))) {
-            throw new AuthorizationException("Your name should contain only alphabetical characters");
+        if (!(Authenticator.isFirstNameValid(dto.getFirst_name()))||
+        (!(Authenticator.isLastNameValid(dto.getLast_name())))) {
+            throw new PreconditionFailException("Your name should contain only alphabetical characters");
         }
         String pass = user.getPassword();
         String confirmPass;
         if (Authenticator.isValidPassword(pass)) {
             confirmPass = dto.getConfirmationPassword();
         } else {
-            throw new AuthorizationException("Password should be: at least 8 symbols long. " +
+            throw new PreconditionFailException("Password should be: at least 8 symbols long. " +
                     "Contain at least one digit. " +
                     "Contain at least one upper case character. " +
                     "No spaces are allowed");
@@ -62,7 +64,7 @@ public class UserController extends AbstractController {
             user.setSubscribed(true);
             userRepository.save(user);
         } else {
-            throw new AuthorizationException("Password should be the same as confirm password ");
+            throw new PreconditionFailException("Password should be the same as confirm password ");
         }
         return new ResponseEntity<>(new HiddenPasswordUserDTO(user), HttpStatus.OK);
     }
@@ -108,7 +110,7 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         if (user.isSubscribed()) {
-            throw new AuthorizationException("You are already subscribed");
+            throw new BadRequestException("You are already subscribed");
         }
         userDao.subscribe(user.getId());
         user.setSubscribed(true);
@@ -128,13 +130,12 @@ public class UserController extends AbstractController {
         return new ResponseEntity<>(new AddressDTO(address), HttpStatus.OK);
     }
 
-
     public Address findAddressById(Long id) {
         Optional<Address> address = addressRepository.findById(id);
         if (address.isPresent()) {
             return address.get();
         } else {
-            throw new NotFoundException("User not found");
+            throw new NotFoundException("Address not found");
         }
     }
 

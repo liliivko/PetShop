@@ -16,6 +16,7 @@ import pisibg.ittalents.model.repository.RatingRepository;
 import utils.SessionManager;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
 public class RatingController extends AbstractController {
 
     @Autowired
-    RatingRepository ratingRepository;
+   private RatingRepository ratingRepository;
     @Autowired
     ProductRepository productRepository;
 
@@ -34,16 +35,25 @@ public class RatingController extends AbstractController {
     }
 
     @GetMapping("/users/ratings")
-    public List<Rating> getRatings(HttpSession session) {
+    public List<RatingDTO> getRatings(HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
         }
-        return ratingRepository.findAllByUser_Id(user.getId());
+        List<Rating> ratings = ratingRepository.findAllByUser_Id(user.getId());
+        List<RatingDTO> ratingDTOList = new ArrayList<>();
+        if (!ratings.isEmpty()) {
+            for (Rating rating : ratings) {
+                RatingDTO ratingDTO = new RatingDTO(rating);
+                ratingDTOList.add(ratingDTO);
+            }
+            return ratingDTOList;
+        }
+        throw new NotFoundException("Nothing to show");
     }
 
-    @PostMapping("ratings/{id}")//TODO if there isn't a product
-    public ResponseEntity<Rating> rateProduct(@RequestBody RatingDTO ratingDto,
+    @PostMapping("ratings/{id}")//TODO if there isn't a product rating dto
+    public ResponseEntity<RatingDTO> rateProduct(@RequestBody RatingDTO ratingDto,
                                               @PathVariable("id") Long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
@@ -55,7 +65,7 @@ public class RatingController extends AbstractController {
         rating.setRating_text(ratingDto.getRating_text());
         rating.setRating_stars(ratingDto.getRating_stars());
         ratingRepository.save(rating);
-        return new ResponseEntity<>(rating, HttpStatus.CREATED);
+        return new ResponseEntity<>(new RatingDTO(rating), HttpStatus.CREATED);
     }
 
     public Product getProductById(Long id) {

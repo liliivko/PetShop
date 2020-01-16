@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import pisibg.ittalents.exception.AuthorizationException;
 import pisibg.ittalents.exception.EmptyCartException;
+import pisibg.ittalents.exception.PreconditionFailException;
 import pisibg.ittalents.model.dto.ErrorDTO;
 
+import javax.persistence.RollbackException;
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -49,6 +52,39 @@ public abstract class AbstractController {
     @ExceptionHandler(MailException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDTO handleMailException(Exception e) {
+        ErrorDTO errorDTO = new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
+
+    @ExceptionHandler(PreconditionFailException.class)
+    @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
+    public ErrorDTO handleConditionException(Exception e) {
+        ErrorDTO errorDTO = new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.PRECONDITION_FAILED.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleConstraints(Exception e) {
+        ErrorDTO errorDTO = new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
+
+    @ExceptionHandler(RollbackException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleTransactionError(Exception e) {
         ErrorDTO errorDTO = new ErrorDTO(
                 e.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
