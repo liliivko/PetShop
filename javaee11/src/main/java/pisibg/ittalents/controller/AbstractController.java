@@ -77,7 +77,7 @@ public abstract class AbstractController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDTO handleConstraints(Exception e) {
         ErrorDTO errorDTO = new ErrorDTO(
-                e.getMessage(),
+                "Bad request",
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());

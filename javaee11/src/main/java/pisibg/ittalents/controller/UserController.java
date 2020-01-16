@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.model.repository.AddressRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.repository.UserRepository;
-import utils.Authenticator;
-import utils.SessionManager;
+import pisibg.ittalents.utils.Authenticator;
+import pisibg.ittalents.utils.SessionManager;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -189,7 +189,7 @@ public class UserController extends AbstractController {
         }
         Optional<Address> address = addressRepository.findById(id);
         if(!address.isPresent()){
-            throw new NotFoundException("");
+            throw new NotFoundException("Not found");
         }
         if(!address.get().getUsersAddresses().contains(user)){
             throw new NotFoundException("");

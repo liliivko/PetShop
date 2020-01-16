@@ -29,5 +29,6 @@ public class PaymentMethod {
     this.setId(id);
 }
     public PaymentMethod(String type) {
+        this.type = type;
     }
 }

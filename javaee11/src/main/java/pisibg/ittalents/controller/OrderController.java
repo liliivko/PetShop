@@ -14,8 +14,9 @@ import pisibg.ittalents.model.pojo.Order;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.OrderRepository;
+import pisibg.ittalents.model.repository.PaymentMethodRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
-import utils.SessionManager;
+import pisibg.ittalents.utils.SessionManager;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,6 +34,8 @@ public class OrderController extends AbstractController{
     OrderRepository orderRepository;
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    PaymentMethodRepository paymentMethodRepository;
 
     @GetMapping(value = "viewOrder/{id}")
     public List<ProductWithOrderPriceDTO> view(@PathVariable("id") long orderId, HttpSession session, HttpServletResponse response) throws SQLException {
@@ -56,8 +59,8 @@ public class OrderController extends AbstractController{
                 if(product.isPresent()){
                     totalPrice += p.getPrice()*p.getQuantity();
                     Product pr = product.get();
+                    pr.setQuantity(p.getQuantity());
                     products.add(new ProductWithOrderPriceDTO(pr, order));
-
                 }
                 else{
                     throw new NotFoundException("Product not found");

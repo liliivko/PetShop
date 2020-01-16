@@ -11,6 +11,7 @@ import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pisibg.ittalents.model.dto.ProductFromCartDTO;
+import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
 import pisibg.ittalents.model.dto.RegularPriceProductDTO;
 import pisibg.ittalents.model.pojo.Discount;
 import pisibg.ittalents.model.pojo.Subcategory;

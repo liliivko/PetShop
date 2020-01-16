@@ -1,4 +1,4 @@
-package utils;
+package pisibg.ittalents.utils;
 
 import lombok.NoArgsConstructor;
 import pisibg.ittalents.model.pojo.User;

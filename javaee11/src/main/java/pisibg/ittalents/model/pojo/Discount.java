@@ -1,7 +1,7 @@
 package pisibg.ittalents.model.pojo;
 
+
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +12,11 @@ import pisibg.ittalents.model.dto.DiscountDTO;
 import javax.persistence.*;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -31,8 +34,10 @@ public class Discount {
     @NotNull
     private double amount;
     @Future
+    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date_from;
     @Future
+    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date_to;
 
     public Discount(DiscountDTO dto){

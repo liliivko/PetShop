@@ -5,15 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pisibg.ittalents.model.pojo.Discount;
-import pisibg.ittalents.model.pojo.User;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.sql.Time;
-import java.sql.Timestamp;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 
 @Setter
 @Getter
@@ -24,13 +20,12 @@ public class DiscountDTO {
     private String name;
     @NotNull
     private double amount;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
+    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date_from;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
+   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date_to;
-
 
     public DiscountDTO(Discount discount) {
         setId(discount.getId());

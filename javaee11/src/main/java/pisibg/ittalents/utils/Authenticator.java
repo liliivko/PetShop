@@ -1,17 +1,14 @@
-package utils;
+package pisibg.ittalents.utils;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
-import pisibg.ittalents.exception.NotFoundException;
+import pisibg.ittalents.exception.BadRequestException;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.pojo.User;
-import pisibg.ittalents.model.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,11 +52,17 @@ public class Authenticator {
     }
 
     public static boolean isFirstNameValid(String firstName) {
+        if (firstName == null || firstName.isEmpty()) {
+           return false;
+        }
         Matcher matcher = VALID_NAME.matcher(firstName);
         return matcher.find();
     }
 
     public static boolean isLastNameValid(String lastName) {
+        if (lastName == null) {
+            return false;
+        }
         Matcher matcher = VALID_NAME.matcher(lastName);
         return matcher.find();
     }
@@ -70,6 +73,9 @@ public class Authenticator {
     }
 
     public static boolean dateValid(LocalDateTime date1, LocalDateTime date2) {
+        if(date1==null ||date2==null || date2.toString().trim().isEmpty() || date1.toString().trim().isEmpty()){
+            throw new BadRequestException("Date should be valid in format yyyy-mm-dd hh:mm:ss");
+        }
         return date2.isAfter(date1);
     }
 

@@ -15,7 +15,7 @@ import pisibg.ittalents.model.repository.OrderRepository;
 import pisibg.ittalents.model.repository.PaymentMethodRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
-import utils.SessionManager;
+import pisibg.ittalents.utils.SessionManager;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -132,7 +132,7 @@ public class CartController extends AbstractController {
 
     @PostMapping(value = "checkout/paymentmethod/{paymentmethod}/address/{address}")
     public OrdersByUserDTO checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod,
-                                    @PathVariable("address") long address) {
+                                    @PathVariable("address") long address) throws SQLException {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
@@ -159,7 +159,7 @@ public class CartController extends AbstractController {
             }
             orderRepository.save(order);
             user.getOrders().add(order);
-            cart.clear();
+            session.setAttribute("cart", null);
         }
         order.getPaymentMethod().setType(paymentMethodRepository.getOne(paymentMethod).getType());
         return new OrdersByUserDTO(order);

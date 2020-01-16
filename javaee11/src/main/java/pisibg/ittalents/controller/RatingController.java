@@ -12,7 +12,7 @@ import pisibg.ittalents.model.pojo.Rating;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.repository.RatingRepository;
-import utils.SessionManager;
+import pisibg.ittalents.utils.SessionManager;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;

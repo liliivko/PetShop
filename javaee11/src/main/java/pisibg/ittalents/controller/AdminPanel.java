@@ -17,8 +17,8 @@ import pisibg.ittalents.model.pojo.Discount;
 import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.*;
-import utils.Authenticator;
-import utils.SessionManager;
+import pisibg.ittalents.utils.Authenticator;
+import pisibg.ittalents.utils.SessionManager;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpSession;
@@ -65,13 +65,16 @@ public class AdminPanel extends AbstractController {
         if (!(subcategoryRepository.existsById(product.getSubcategory().getId()))) {
             throw new BadRequestException("You should select an existing category.");
         }
-        if (product.getName().isEmpty() || product.getName() == null) {
-            throw new BadRequestException("You should write a name for the product");
+        if (product.getName().isEmpty() || product.getName() == null|| product.getName().trim().isEmpty()
+                || productRepository.existsByName(product.getName())) {
+            throw new BadRequestException("You should write a name for the product " +
+                    "and it should differ from existing products.");
         }
         if (product.getQuantity() < 0) {
             throw new BadRequestException("Quantity should not have a negative value.");
         }
-        if (product.getDescription().isEmpty() || product.getDescription() == null) {
+        if (product.getDescription().isEmpty() || product.getDescription() == null
+                || product.getDescription().trim().isEmpty()) {
             throw new BadRequestException("The description should not be empty.");
         }
         productRepository.save(product);
@@ -117,7 +120,6 @@ public class AdminPanel extends AbstractController {
         }
     }
 
-
     @PostMapping("/discounts/add")
     public ResponseEntity<DiscountDTO> addDiscount(@RequestBody DiscountDTO discountDTO,
                                                    HttpSession session) throws PreconditionFailException {
@@ -131,6 +133,7 @@ public class AdminPanel extends AbstractController {
                 throw new AuthorizationException("You are not authorized");
             }
             discount = new Discount(discountDTO);
+
             if (!Authenticator.dateValid(discount.getDate_from(), discount.getDate_to())) {
                 throw new PreconditionFailException("Date should be valid");
             }
@@ -194,7 +197,13 @@ public class AdminPanel extends AbstractController {
         if (!findUserById(user.getId()).isAdmin()) {
             throw new AuthorizationException("You are not authorized");
         }
-        Product product = productRepository.getOne(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        Product product = null;
+        if (optionalProduct.isPresent()) {
+            product = optionalProduct.get();
+        } else {
+            throw new NotFoundException("Product not found");
+        }
         String path = "C://Users//User//NewRepo//PetShop//pictures//";
         String pictureName = getNameForUpload(Objects.requireNonNull(multipartFile.getOriginalFilename()), product);
         File picture = new File(path + pictureName);
