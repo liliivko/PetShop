@@ -4,19 +4,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.ProductNotFoundException;
 import pisibg.ittalents.model.dto.ProductWithCurrentPriceDTO;
+import pisibg.ittalents.model.pojo.Category;
+import pisibg.ittalents.model.pojo.Subcategory;
+import pisibg.ittalents.model.repository.CategoryRepository;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.pojo.Product;
+import pisibg.ittalents.model.repository.SubcategoryRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ProductController extends AbstractController {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private SubcategoryRepository subcategoryRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @GetMapping(value = "/products/all")
     public List<ProductWithCurrentPriceDTO> getAll() throws SQLException {
@@ -31,8 +40,50 @@ public class ProductController extends AbstractController {
     @GetMapping(value = "/products/{id}")
     public ProductWithCurrentPriceDTO getById(@PathVariable("id") long id) throws ProductNotFoundException, SQLException {
         if (productRepository.findById(id).isPresent()) {
-           Product product = productRepository.findById(id).get();
-           return new ProductWithCurrentPriceDTO(product);
+            Product product = productRepository.findById(id).get();
+            return new ProductWithCurrentPriceDTO(product);
+        } else {
+            throw new ProductNotFoundException("Product not found!");
+        }
+    }
+
+    @GetMapping(value = "/products/subcategory/{id}")
+    public List<ProductWithCurrentPriceDTO> getAllByName(@PathVariable("id") long id) throws ProductNotFoundException, SQLException {
+       Optional<Subcategory> optionalSubcategory = subcategoryRepository.findById(id);
+        List<Product> products = new ArrayList<>();
+        if(optionalSubcategory.isPresent()) {
+            Subcategory subcategory = optionalSubcategory.get();
+           products = productRepository.findAllBySubcategory(subcategory);
+        }
+        List<ProductWithCurrentPriceDTO> productsWithPrices = new ArrayList<>();
+        if (!(products.isEmpty())) {
+            for (Product p: products) {
+                productsWithPrices.add(new ProductWithCurrentPriceDTO(p));
+            }
+            return productsWithPrices;
+        } else {
+            throw new ProductNotFoundException("Product not found!");
+        }
+    }
+
+    @GetMapping(value = "/products/category/{id}")
+    public List<ProductWithCurrentPriceDTO> getAllByCa(@PathVariable("id") long id) throws ProductNotFoundException, SQLException {
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        List<Product> products = new ArrayList<>();
+        List<Subcategory> subcategories = new ArrayList<>();
+        if(optionalCategory.isPresent()) {
+            Category category = optionalCategory.get();
+            subcategories = subcategoryRepository.findAllByCategory(category);
+        }
+        for (Subcategory s: subcategories) {
+            products.addAll(productRepository.findAllBySubcategory(s));
+        }
+        List<ProductWithCurrentPriceDTO> productsWithPrices = new ArrayList<>();
+        if (!(products.isEmpty())) {
+            for (Product p: products) {
+                productsWithPrices.add(new ProductWithCurrentPriceDTO(p));
+            }
+            return productsWithPrices;
         } else {
             throw new ProductNotFoundException("Product not found!");
         }
@@ -128,6 +179,5 @@ public class ProductController extends AbstractController {
             throw new ProductNotFoundException("Products not found!");
         }
     }
-
 }
 
