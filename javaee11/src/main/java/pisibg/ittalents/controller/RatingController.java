@@ -1,5 +1,4 @@
 package pisibg.ittalents.controller;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import pisibg.ittalents.model.pojo.User;
 import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.repository.RatingRepository;
 import utils.SessionManager;
-
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +26,6 @@ public class RatingController extends AbstractController {
     @Autowired
     ProductRepository productRepository;
 
-    //TODO make it only accessible by admin
-    @GetMapping("/ratings")
-    public List<Rating> getAll() {
-        return ratingRepository.findAll();
-    }
 
     @GetMapping("/users/ratings")
     public List<RatingDTO> getRatings(HttpSession session) {
@@ -52,9 +45,9 @@ public class RatingController extends AbstractController {
         throw new NotFoundException("Nothing to show");
     }
 
-    @PostMapping("ratings/{id}")//TODO if there isn't a product rating dto
+    @PostMapping("ratings/{id}")
     public ResponseEntity<RatingDTO> rateProduct(@RequestBody RatingDTO ratingDto,
-                                              @PathVariable("id") Long id, HttpSession session) {
+                                                @PathVariable("id") long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
@@ -87,7 +80,7 @@ public class RatingController extends AbstractController {
     }
 
     @GetMapping("/products/{id}/ratings/")
-    public List<Rating> getRatingsForProduct(@PathVariable("id") Long id, HttpSession session) {
+    public List<Rating> getRatingsForProduct(@PathVariable("id") long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
@@ -96,7 +89,7 @@ public class RatingController extends AbstractController {
     }
 
     @DeleteMapping("/ratings/{id}")
-    public void deleteById(@PathVariable("id") Long id, HttpSession session) {
+    public ResponseEntity<String> deleteMyRating(@PathVariable("id") long id, HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
@@ -105,5 +98,6 @@ public class RatingController extends AbstractController {
             throw new AuthorizationException("You are not authorized to delete this rating");
         }
         ratingRepository.deleteById(id);
+        return new ResponseEntity<>("Rating deleted", HttpStatus.CREATED);
     }
 }

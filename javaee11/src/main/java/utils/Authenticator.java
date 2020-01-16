@@ -1,16 +1,23 @@
 package utils;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+import pisibg.ittalents.exception.NotFoundException;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.pojo.User;
+import pisibg.ittalents.model.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class Authenticator {
+
 
     public static final Pattern VALID_ADDRESS = Pattern.compile("^[a-zA-Z]*$");
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
@@ -58,7 +65,7 @@ public class Authenticator {
     }
 
     public static boolean isCityValid(String city) {
-        Matcher matcher = VALID_NAME.matcher(city);
+        Matcher matcher = VALID_ADDRESS.matcher(city);
         return matcher.find();
     }
 

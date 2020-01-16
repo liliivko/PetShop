@@ -44,8 +44,8 @@ public class UserController extends AbstractController {
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new AuthorizationException("An account with this email exists.Please, log in");
         }
-        if (!(Authenticator.isFirstNameValid(dto.getFirst_name()))||
-        (!(Authenticator.isLastNameValid(dto.getLast_name())))) {
+        if (!(Authenticator.isFirstNameValid(dto.getFirst_name())) ||
+                (!(Authenticator.isLastNameValid(dto.getLast_name())))) {
             throw new PreconditionFailException("Your name should contain only alphabetical characters");
         }
         String pass = user.getPassword();
@@ -88,6 +88,32 @@ public class UserController extends AbstractController {
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         return new ResponseEntity<>("You have logged out", HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("id") long id, HttpSession session) {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (user == null) {
+            throw new AuthorizationException("You need to log in first");
+        }
+        if (SessionManager.isLogged(session)) {
+            if (user.getId() != findUserById(id).getId()) {
+                throw new AuthorizationException("You are not authorized");
+            }
+            userRepository.deleteById(id);
+            session.invalidate();
+        }
+        return new ResponseEntity<>("User " + user.getId() + " deleted successfully!", HttpStatus.OK);
+    }
+
+    public User findUserById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            throw new NotFoundException("User not found");
+        }
     }
 
     @PutMapping("/users/unsubscribe")
@@ -151,7 +177,7 @@ public class UserController extends AbstractController {
         }
         address.removeAddressToUser(user);
         addressRepository.delete(address);
-        return new ResponseEntity<>("You have deleted an address", HttpStatus.OK);
+        return new ResponseEntity<>("Address: " + address.getId()+ " deleted successfully!", HttpStatus.OK);
     }
 
     @PutMapping("/addresses/{id}")

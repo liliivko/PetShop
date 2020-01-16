@@ -97,7 +97,7 @@ public class AdminPanel extends AbstractController {
 
 
     @GetMapping(value = "/users/all")
-    public List<User> getAllUsers(HttpSession session) throws SQLException {
+    public List<User> getAllUsers(HttpSession session) {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You have to log in");
@@ -118,26 +118,10 @@ public class AdminPanel extends AbstractController {
         }
     }
 
-    //TODO fix
-    @DeleteMapping("/users/delete")
-    public ResponseEntity<String> deleteUser(HttpSession session, Long id) {
-        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
-        if (user == null) {
-            throw new AuthorizationException("You need to log in first");
-        }
-        if (SessionManager.isLogged(session)) {
-            if (!findUserById(user.getId()).isAdmin()) { //TODO check
-                throw new AuthorizationException("You are not authorized");
-            }
-            userRepository.deleteById(id);
-            session.invalidate();
-        }
-        return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
-    }
 
     @PostMapping("/discounts/add")
     public ResponseEntity<DiscountDTO> addDiscount(@RequestBody DiscountDTO discountDTO,
-                                              HttpSession session) throws PreconditionFailException {
+                                                   HttpSession session) throws PreconditionFailException {
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
         if (user == null) {
             throw new AuthorizationException("You need to log in first");
@@ -156,7 +140,28 @@ public class AdminPanel extends AbstractController {
         return new ResponseEntity<>(new DiscountDTO(discount), HttpStatus.CREATED);
     }
 
-    //TODO delete discount
+    @DeleteMapping(value = "/discounts/{id}")
+    public void removeDiscount(@PathVariable("id") long id, HttpSession session) {
+        User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
+        if (user == null) {
+            throw new AuthorizationException("You have to log in");
+        }
+        if (!findUserById(user.getId()).isAdmin()) {
+            throw new AuthorizationException("You are not authorized");
+        }
+        if (!discountRepository.existsById(id)) {
+            throw new NotFoundException("The resource you're trying to reach doesn't exist.");
+        } else {
+            List<Product> productsWithThisDiscount = productRepository.findAllByDiscountId(id);
+            if (!productsWithThisDiscount.isEmpty()) {
+                for (Product product : productsWithThisDiscount) {
+                    product.setDiscount(null);
+                }
+            }
+            discountRepository.deleteById(id);
+
+        }
+    }
 
     @PostMapping("applyDiscount")
     public ResponseEntity<String> applytoSubcategory(@RequestParam("discount_id") long discountId,

@@ -10,7 +10,7 @@ import java.util.Properties;
 
 
 @Component
-public class NotificationService {
+public class NotificationService extends AbstractController{
     private static final String SEND_FROM = "pisibg11@gmail.com";
     private static final String PASSWORD = "pisibgjava11";
 
@@ -21,6 +21,7 @@ public class NotificationService {
         prop.put("mail.smtp.port", "587");
         prop.put("mail.smtp.auth", "true");
         prop.put("mail.smtp.starttls.enable", "true");
+        prop.put("mail.debug", "true");
 
         Session session = Session.getInstance(prop,
                 new javax.mail.Authenticator() {
