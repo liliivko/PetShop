@@ -1,6 +1,8 @@
 package pisibg.ittalents.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.exception.*;
 import pisibg.ittalents.model.dto.OrdersByUserDTO;
@@ -46,6 +48,8 @@ public class CartController extends AbstractController {
             HashMap<Long, Integer> cart = new HashMap<>();
             cart.put(product.getId(), pieces);
             session.setAttribute("cart", cart);
+              product.setQuantity(product.getQuantity() - pieces);
+              productRepository.save(product);
               ProductWithCurrentPriceDTO productWithCurrentPriceDTO = new ProductWithCurrentPriceDTO(product);
               productWithCurrentPriceDTO.setQuantity(pieces);
               return productWithCurrentPriceDTO;
@@ -76,7 +80,7 @@ public class CartController extends AbstractController {
     }
 
     @DeleteMapping(value = "remove/{id}/quantity/{pieces}")
-    public void remove(@PathVariable("id") long id, @PathVariable("pieces") int pieces, HttpSession session) throws ProductNotFoundException {
+    public ResponseEntity<String> remove(@PathVariable("id") long id, @PathVariable("pieces") int pieces, HttpSession session) throws ProductNotFoundException {
         if(!(productRepository.findById(id).isPresent())){
             throw new ProductNotFoundException("Product not found.");
         }
@@ -99,10 +103,10 @@ public class CartController extends AbstractController {
                     product.setQuantity(product.getQuantity() + quantity);
                     productRepository.save(product);
                 }
-
             }
             session.setAttribute("cart", cart);
         }
+        return new ResponseEntity<>("Product removed from cart.", HttpStatus.OK);
     }
 
     @GetMapping(value = "myCart")
@@ -126,8 +130,6 @@ public class CartController extends AbstractController {
         }
     }
 
-    //TODO - by session invalidation (logout, dies, restart) - DB should be updated with the quantities from all the carts!
-
     @PostMapping(value = "checkout/paymentmethod/{paymentmethod}/address/{address}")
     public OrdersByUserDTO checkOut(HttpSession session, @PathVariable("paymentmethod") long paymentMethod,
                                     @PathVariable("address") long address) {
@@ -135,7 +137,7 @@ public class CartController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         User user = (User) session.getAttribute(SessionManager.USER__LOGGED);
-        Order order = new Order();
+        Order order = null;
         if (session.getAttribute("cart") == null) {
             throw new EmptyCartException("Cart is empty, nothing to order.");}
         if(!(paymentMethodRepository.existsById(paymentMethod))){

@@ -57,7 +57,6 @@ public class AdminPanel extends AbstractController {
         if (!findUserById(user.getId()).isAdmin()) {
             throw new AuthorizationException("You are not authorized");
         }
-        //TODO validate properties!
         regularPriceProductDTO.setSubcategory(subcategoryRepository.getOne(regularPriceProductDTO.getSubcategoryId()));
         Product product = new Product(regularPriceProductDTO);
         if (product.getPrice() <= 0) {

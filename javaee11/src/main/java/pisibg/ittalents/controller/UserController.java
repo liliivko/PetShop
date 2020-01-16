@@ -13,15 +13,19 @@ import pisibg.ittalents.model.dto.HiddenPasswordUserDTO;
 import pisibg.ittalents.model.dto.LoginUserDTO;
 import pisibg.ittalents.model.dto.RegisterUserDTO;
 import pisibg.ittalents.model.pojo.Address;
+import pisibg.ittalents.model.pojo.Product;
 import pisibg.ittalents.model.pojo.User;
 import org.springframework.web.bind.annotation.*;
 import pisibg.ittalents.model.repository.AddressRepository;
+import pisibg.ittalents.model.repository.ProductRepository;
 import pisibg.ittalents.model.repository.UserRepository;
 import utils.Authenticator;
 import utils.SessionManager;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,6 +37,8 @@ public class UserController extends AbstractController {
     private UserRepository userRepository;
     @Autowired
     AddressRepository addressRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @PostMapping(value = "/users/register")
     public ResponseEntity<HiddenPasswordUserDTO> register(@RequestBody RegisterUserDTO dto, HttpSession session)
@@ -86,6 +92,15 @@ public class UserController extends AbstractController {
 
     @PostMapping("/users/logout")
     public ResponseEntity<String> logout(HttpSession session) {
+        if (!(session.getAttribute("cart") == null)) {
+            HashMap<Long, Integer> cart = (HashMap<Long, Integer>)session.getAttribute("cart");
+            for (Map.Entry e: cart.entrySet()) {
+                Product product = productRepository.findById((Long) e.getKey()).get();
+                int quantity = (int) e.getValue();
+                product.setQuantity(product.getQuantity() + quantity);
+                productRepository.save(product);
+                }
+            }
         session.invalidate();
         return new ResponseEntity<>("You have logged out", HttpStatus.OK);
     }
@@ -151,12 +166,13 @@ public class UserController extends AbstractController {
             throw new AuthorizationException("You have to log in first");
         }
         Address address = new Address(addressDTO);
+        user.getAddresses().add(address);
         address.addAddressToUser(user);
         addressRepository.save(address);
         return new ResponseEntity<>(new AddressDTO(address), HttpStatus.OK);
     }
 
-    public Address findAddressById(Long id) {
+    public Address findAddressById(long id) {
         Optional<Address> address = addressRepository.findById(id);
         if (address.isPresent()) {
             return address.get();
@@ -171,13 +187,16 @@ public class UserController extends AbstractController {
         if (!SessionManager.isLogged(session)) {
             throw new AuthorizationException("You have to log in first");
         }
-        Address address = findAddressById(id);
-        if (!user.getAddresses().contains(address)) {
-            throw new NotFoundException("Address not found");
+        Optional<Address> address = addressRepository.findById(id);
+        if(!address.isPresent()){
+            throw new NotFoundException("");
         }
-        address.removeAddressToUser(user);
-        addressRepository.delete(address);
-        return new ResponseEntity<>("Address: " + address.getId()+ " deleted successfully!", HttpStatus.OK);
+        if(!address.get().getUsersAddresses().contains(user)){
+            throw new NotFoundException("");
+        }
+        user.getAddresses().remove(address);
+        addressRepository.delete(address.get());
+        return new ResponseEntity<>("Address deleted successfully!", HttpStatus.OK);
     }
 
     @PutMapping("/addresses/{id}")
