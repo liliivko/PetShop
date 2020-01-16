@@ -22,7 +22,7 @@ public class RatingDAO extends DAO{
             "image, SUM(rating_stars)/count(rating_stars) as rating_stars FROM products as p\n" +
             "JOIN ratings as r\n" +
             "ON r.product_id = p.id\n" +
-            "JOIN discounts as d\n" +
+            "LEFT OUTER JOIN discounts as d\n" +
             "ON d.id = p.discount_id\n" +
             "GROUP BY p.id;\n";
 
